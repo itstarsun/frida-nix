@@ -6,7 +6,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     frida-nix.url = "github:itstarsun/frida-nix";
-    frida-nix.inputs.nixpkgs-lib.follows = "nixpkgs";
+    frida-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs:
