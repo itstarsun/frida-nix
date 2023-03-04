@@ -8,6 +8,7 @@ import logging
 import os
 from collections import defaultdict
 from contextlib import suppress
+from dataclasses import dataclass
 from itertools import product
 from typing import Any
 
@@ -16,17 +17,36 @@ import aiohttp
 MIN_RELEASE_VERSION = 16
 MIN_TOOLS_VERSION = 12
 
+
+@dataclass
+class System:
+    name: str
+    download_name: str
+
+
+@dataclass
+class Devkit:
+    name: str
+
+    def download_file_for(self, version: str, system: System) -> str:
+        return f"{self.name}-devkit-{version}-{system.download_name}.tar.xz"
+
+    def download_url_for(self, version: str, system: System) -> str:
+        file = self.download_file_for(version, system)
+        return f"https://github.com/frida/frida/releases/download/{version}/{file}"
+
+
 SYSTEMS = [
-    "aarch64-darwin",
-    "aarch64-linux",
-    "x86_64-darwin",
-    "x86_64-linux",
+    System("aarch64-darwin", "macos-arm64"),
+    System("aarch64-linux", "linux-arm64"),
+    System("x86_64-darwin", "macos-x86_64"),
+    System("x86_64-linux", "linux-x86_64"),
 ]
 
 DEVKITS = [
-    "frida-core",
-    "frida-gum",
-    "frida-gumjs",
+    Devkit("frida-core"),
+    Devkit("frida-gum"),
+    Devkit("frida-gumjs"),
 ]
 
 logging.basicConfig(level=logging.INFO)
@@ -92,44 +112,30 @@ class Fetcher:
         await fetch_frida_python_task
         async with asyncio.TaskGroup() as tg:
             releases = self.metadata["releases"]
-            for (version, system, name) in product(releases.keys(), SYSTEMS, DEVKITS):
+            for (version, system, devkit) in product(releases.keys(), SYSTEMS, DEVKITS):
                 per_system = releases[version].setdefault("per-system", {})
-                sources = per_system.setdefault(system, {})
-                source = sources.setdefault(name, {})
+                sources = per_system.setdefault(system.name, {})
+                source = sources.setdefault(devkit.name, {})
                 tg.create_task(
-                    self._fetch_frida_devkit_for(source, version, system, name)
+                    self._fetch_frida_devkit_for(source, version, system, devkit)
                 )
 
     async def _fetch_frida_devkit_for(
         self,
         source: dict[str, str],
         version: str,
-        system: str,
-        name: str,
+        system: System,
+        devkit: Devkit,
     ) -> None:
         if source.get("sha256", "") != "":
             return
+        source["url"] = url = devkit.download_url_for(version, system)
         async with self.limiter:
-            logging.info(f"fetching {name}-{version} for {system}")
-            source["url"] = self._generate_source_url(version, system, name)
-            async with self.session.get(source["url"]) as resp:
+            logging.info(f"fetching {devkit.name}-{version} for {system.name}")
+            async with self.session.get(url) as resp:
                 resp.raise_for_status()
                 sha256 = hashlib.sha256(await resp.read()).digest()
                 source["sha256"] = self._sha256_to_sri(sha256)
-
-    def _generate_source_url(self, version: str, system: str, name: str) -> str:
-        (arch, os) = system.split("-", 1)
-        if arch == "aarch64":
-            arch = "arm64"
-        if os == "darwin":
-            os = "macos"
-        target = f"{os}-{arch}"
-        match name:
-            case "frida-core" | "frida-gum" | "frida-gumjs":
-                file = f"{name}-devkit-{version}-{target}.tar.xz"
-            case _:
-                raise ValueError(name)
-        return f"https://github.com/frida/frida/releases/download/{version}/{file}"
 
     def _sha256_to_sri(self, sha256: bytes) -> str:
         return "sha256-%s" % base64.b64encode(sha256).decode("utf-8")
@@ -143,13 +149,6 @@ class Fetcher:
 
     def _parse_version(self, version: str) -> tuple[int, int, int]:
         return tuple(map(int, version.split(".")))
-
-    def _compare_version(self, x: str, y: str) -> int:
-        a, b = self._parse_version(x), self._parse_version(y)
-        return (a > b) - (a < b)
-
-    def _compare_version_tuple(self, x: tuple[str, ...], y: tuple[str, ...]) -> int:
-        return self._compare_version(x[0], y[0])
 
     def _filter_version(
         self,
