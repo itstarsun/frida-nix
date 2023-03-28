@@ -7,62 +7,68 @@ let
 in
 {
   options = {
-    perSystem = mkPerSystemOption ({ config, pkgs, ... }: {
-      options = {
-        frida = {
-          version = mkOption {
-            type = types.str;
-            default = config.frida.metadata.latest-release;
-          };
+    perSystem = mkPerSystemOption ({ config, pkgs, ... }:
+      let
+        cfg = config.frida;
+      in
+      {
+        options = {
+          frida = {
+            version = mkOption {
+              type = types.str;
+              default = cfg.metadata.latest-release;
+            };
 
-          tools-version = mkOption {
-            type = types.str;
-            default = config.frida.metadata.latest-tools;
-          };
+            tools-version = mkOption {
+              type = types.str;
+              default = cfg.metadata.latest-tools;
+            };
 
-          metadata = mkOption {
-            type = types.raw;
-            default = frida.default-metadata;
-          };
-
-          build = {
-            pkgs = mkOption {
+            metadata = mkOption {
               type = types.raw;
+              default = frida.default-metadata;
             };
 
-            frida-core = mkOption {
-              type = types.package;
-              default = config.frida.build.pkgs.frida-core;
-            };
+            build = {
+              pkgs = mkOption {
+                type = types.raw;
+              };
 
-            frida-gum = mkOption {
-              type = types.package;
-              default = config.frida.build.pkgs.frida-gum;
-            };
+              frida-core = mkOption {
+                type = types.package;
+                default = cfg.build.pkgs.frida-core;
+              };
 
-            frida-gumjs = mkOption {
-              type = types.package;
-              default = config.frida.build.pkgs.frida-gumjs;
-            };
+              frida-gum = mkOption {
+                type = types.package;
+                default = cfg.build.pkgs.frida-gum;
+              };
 
-            frida-python = mkOption {
-              type = types.package;
-              default = config.frida.build.pkgs.python3Packages.frida;
-            };
+              frida-gumjs = mkOption {
+                type = types.package;
+                default = cfg.build.pkgs.frida-gumjs;
+              };
 
-            frida-tools = mkOption {
-              type = types.package;
-              default = config.frida.build.pkgs.python3Packages.frida-tools;
+              frida-python = mkOption {
+                type = types.package;
+                default = cfg.build.pkgs.python3Packages.frida;
+              };
+
+              frida-tools = mkOption {
+                type = types.package;
+                default = cfg.build.pkgs.python3Packages.frida-tools;
+              };
             };
           };
         };
-      };
 
-      config = {
-        frida.build.pkgs = pkgs.extend (frida.mkOverlay {
-          inherit (config.frida) metadata version tools-version;
-        });
-      };
-    });
+        config = {
+          frida.build.pkgs = pkgs.extend (frida.mkOverlay {
+            inherit (cfg) metadata version tools-version;
+          });
+
+          _module.args.frida = cfg.build;
+        };
+      });
   };
 }

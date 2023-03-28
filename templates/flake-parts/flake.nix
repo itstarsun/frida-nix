@@ -19,9 +19,9 @@
         "x86_64-linux"
       ];
 
-      perSystem = { config, ... }: {
+      perSystem = { frida, ... }: {
         packages = {
-          inherit (config.frida.build)
+          inherit (frida)
             frida-core
             frida-gum
             frida-gumjs
