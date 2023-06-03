@@ -41,13 +41,15 @@
         ];
       in
       {
-        packages = {
+        packages = rec {
           inherit (pkgs)
             frida-core
             frida-gum
             frida-gumjs;
           frida-python = pkgs.python3Packages.frida;
           frida-tools = pkgs.python3Packages.frida-tools;
+
+          default = frida-tools;
         };
 
         apps = (nixpkgs.lib.genAttrs apps (name: flake-utils.lib.mkApp {
