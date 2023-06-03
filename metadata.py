@@ -1,4 +1,5 @@
-#! /usr/bin/env python3
+#! /usr/bin/env nix-shell
+#! nix-shell -i python3 -p python311 python311.pkgs.aiohttp
 
 import asyncio
 import base64
