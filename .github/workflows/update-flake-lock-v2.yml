@@ -1,0 +1,20 @@
+name: update-flake-lock-v2
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  update-flake-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "v2"
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v3
+
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@v19
