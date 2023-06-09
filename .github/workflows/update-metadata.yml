@@ -11,11 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - run: pip install aiohttp
 
       - name: Update metadata
-        run: ./metadata.py
+        run: python3 ./metadata.py
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
