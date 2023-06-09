@@ -20,7 +20,7 @@ jobs:
       - run: pip install aiohttp packaging
 
       - name: Update metadata
-        run: ./metadata.py
+        run: ./update.py
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
