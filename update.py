@@ -78,8 +78,8 @@ async def update(metadata: Metadata) -> None:
         version = str(max(frida.versions))
         tools_version = str(max(frida_tools.versions))
 
-        print(f"frida v{version}")
-        print(f"frida-tools v{tools_version}")
+        print(f"frida v{version}", flush=True)
+        print(f"frida-tools v{tools_version}", flush=True)
 
         if metadata.get("version", version) != version:
             if (sources := metadata.get("sources", None)) is not None:
