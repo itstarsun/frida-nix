@@ -47,9 +47,18 @@ class Devkit(StrEnum):
         return f"https://github.com/frida/frida/releases/download/{version}/{file}"
 
 
+class Binary(StrEnum):
+    FRIDA_SERVER = "frida-server"
+    FRIDA_PORTAL = "frida-portal"
+
+    def download_url_for(self, system: System, version: str) -> str:
+        file = f"{self.value}-{version}-{system.download_name}.xz"
+        return f"https://github.com/frida/frida/releases/download/{version}/{file}"
+
+
 class Metadata(TypedDict, total=False):
     version: str
-    sources: dict[str | Devkit, SourceFile | PerSystemSourceFile]
+    sources: dict[str | Devkit | Binary, SourceFile | PerSystemSourceFile]
 
 
 class SourceFile(TypedDict, total=False):
@@ -94,11 +103,15 @@ async def update(metadata: Metadata) -> None:
 
         sema = asyncio.BoundedSemaphore(os.cpu_count() or 1)
         async with asyncio.TaskGroup() as tg:
-            for devkit in Devkit.__members__.values():
-                per_system = cast(PerSystemSourceFile, sources.setdefault(devkit, {}))
+            for devkit_or_binary in list(Devkit.__members__.values()) + list(
+                Binary.__members__.values()
+            ):
+                per_system = cast(
+                    PerSystemSourceFile, sources.setdefault(devkit_or_binary, {})
+                )
                 for system in System.__members__.values():
                     source_file = per_system.setdefault(system, {})
-                    url = devkit.download_url_for(system, version)
+                    url = devkit_or_binary.download_url_for(system, version)
                     if source_file.get("url", url) != url:
                         source_file["hash"] = ""
                     source_file["url"] = url

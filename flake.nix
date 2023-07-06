@@ -27,6 +27,10 @@
             frida-core
             frida-gum
             frida-gumjs
+
+            frida-server
+            frida-portal
+
             frida-python
             frida-tools
             ;

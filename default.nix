@@ -24,6 +24,11 @@ let
     src = pkgs.fetchurl metadata.sources.${pname}.${system};
   });
 
+  mkFridaBinary = pname: withBaseAttrs (pkgs.callPackage ./frida-binary.nix {
+    inherit pname version;
+    src = pkgs.fetchurl metadata.sources.${pname}.${system};
+  });
+
   mkFridaPython = lib.makeOverridable ({ pythonPackages, frida-core }:
     withBaseAttrs (pythonPackages.callPackage ./frida-python.nix {
       inherit version frida-core;
@@ -37,6 +42,7 @@ let
     }));
 
   devkits = lib.genAttrs [ "frida-core" "frida-gum" "frida-gumjs" ] mkFridaDevkit;
+  binarys = lib.genAttrs [ "frida-server" "frida-portal" ] mkFridaBinary;
 
   pythonArgs = {
     pythonPackages = pkgs.python3.pkgs;
@@ -47,7 +53,7 @@ let
   frida-tools = mkFridaTools pythonArgs;
 in
 
-devkits // {
+devkits // binarys // {
   inherit
     frida-python
     frida-tools
