@@ -20,21 +20,10 @@
       packages = eachSystem (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          frida = pkgs.callPackage ./. { inherit metadata; };
+          frida = import ./. { inherit metadata; inherit pkgs; };
+          frida' = builtins.removeAttrs frida [ "metadata" ];
         in
-        {
-          inherit (frida)
-            frida-core
-            frida-gum
-            frida-gumjs
-
-            frida-server
-            frida-portal
-
-            frida-python
-            frida-tools
-            ;
-
+        frida' // {
           default = frida.frida-tools;
         }
       );
