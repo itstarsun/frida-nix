@@ -1,18 +1,12 @@
 metadata: final: prev:
 
 let
-  frida' = prev.callPackage ./. { inherit metadata; };
-  frida = builtins.removeAttrs frida' [ "overlay" ];
+  frida = import ./. { inherit metadata; pkgs = prev; };
+  frida' = builtins.removeAttrs frida [ "metadata" ];
 in
 
-{
+frida' // {
   inherit frida;
-
-  inherit (frida)
-    frida-core
-    frida-gum
-    frida-gumjs
-    ;
 
   pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
     (pythonPackages: _: {
