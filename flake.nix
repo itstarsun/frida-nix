@@ -15,7 +15,7 @@
       ];
     in
     {
-      overlays.default = import ./overlay.nix metadata;
+      overlays.default = import ./overlay.nix { inherit metadata; };
 
       packages = eachSystem (system:
         let

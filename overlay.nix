@@ -1,4 +1,6 @@
-metadata: final: prev:
+{ metadata ? builtins.fromJSON (builtins.readFile ./metadata.json) }:
+
+final: prev:
 
 let
   frida = import ./. { inherit metadata; pkgs = prev; };
