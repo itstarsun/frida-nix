@@ -15,4 +15,4 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v4
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v19
+        uses: DeterminateSystems/update-flake-lock@v20
