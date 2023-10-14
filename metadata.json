@@ -5,8 +5,8 @@
       "hash": "sha256-stOiL4QizZN57io8qHDlDNsXBs+ki+lYe/g11j5R5YI="
     },
     "frida-tools": {
-      "hash": "sha256-jN3QszH+sFcjsfOVuJSSvgHiMyCVmNg98auK8sFLt8s=",
-      "version": "12.2.1"
+      "hash": "sha256-jtxn0a43kv9bLcY1CM3k0kf5K30Ne/FT10ohptWNwEU=",
+      "version": "12.3.0"
     },
     "frida-core": {
       "aarch64-darwin": {
