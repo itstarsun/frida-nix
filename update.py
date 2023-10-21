@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#! /usr/bin/env nix-shell
+#! nix-shell -i python3 -p python311 python311.pkgs.aiohttp python311.pkgs.packaging
 
 from __future__ import annotations
 
@@ -11,11 +12,13 @@ from binascii import unhexlify
 from contextlib import suppress
 from enum import StrEnum
 from hashlib import sha256
-from typing import NewType, TypedDict, cast
+from pathlib import Path
+from typing import Iterator, NewType, TypedDict, cast
 
 import aiohttp
+from packaging.version import Version
 
-import pypi
+METADATA = Path(__file__).parent / "metadata.json"
 
 
 class System(StrEnum):
@@ -37,28 +40,28 @@ class System(StrEnum):
                 return "linux-x86_64"
 
 
-class Devkit(StrEnum):
+class Prebuilt(StrEnum):
     FRIDA_CORE = "frida-core"
     FRIDA_GUM = "frida-gum"
     FRIDA_GUMJS = "frida-gumjs"
-
-    def download_url_for(self, system: System, version: str) -> str:
-        file = f"{self.value}-devkit-{version}-{system.download_name}.tar.xz"
-        return f"https://github.com/frida/frida/releases/download/{version}/{file}"
-
-
-class Binary(StrEnum):
     FRIDA_SERVER = "frida-server"
     FRIDA_PORTAL = "frida-portal"
 
+    def download_file_for(self, system: System, version: str) -> str:
+        match self:
+            case Prebuilt.FRIDA_CORE | Prebuilt.FRIDA_GUM | Prebuilt.FRIDA_GUMJS:
+                return f"{self.value}-devkit-{version}-{system.download_name}.tar.xz"
+            case Prebuilt.FRIDA_SERVER | Prebuilt.FRIDA_PORTAL:
+                return f"{self.value}-{version}-{system.download_name}.xz"
+
     def download_url_for(self, system: System, version: str) -> str:
-        file = f"{self.value}-{version}-{system.download_name}.xz"
+        file = self.download_file_for(system, version)
         return f"https://github.com/frida/frida/releases/download/{version}/{file}"
 
 
 class Metadata(TypedDict, total=False):
     version: str
-    sources: dict[str | Devkit | Binary, SourceFile | PerSystemSourceFile]
+    sources: dict[str | Prebuilt, SourceFile | PerSystemSourceFile]
 
 
 class SourceFile(TypedDict, total=False):
@@ -70,22 +73,58 @@ class SourceFile(TypedDict, total=False):
 PerSystemSourceFile = NewType("PerSystemSourceFile", dict[System, SourceFile])
 
 
+class PyPIProject(TypedDict):
+    name: str
+    files: list[PyPIFile]
+    versions: list[str]
+
+
+class PyPIFile(TypedDict):
+    filename: str
+    url: str
+    hashes: dict[str, str]
+
+
+async def get_pypi_project(session: aiohttp.ClientSession, name: str) -> PyPIProject:
+    async with session.get(
+        f"https://pypi.org/simple/{name}/",
+        headers={"Accept": "application/vnd.pypi.simple.v1+json"},
+    ) as resp:
+        resp.raise_for_status()
+        return cast(PyPIProject, await resp.json())
+
+
+def pypi_files_for(project: PyPIProject, version: Version | str) -> Iterator[PyPIFile]:
+    prefix = f'{project["name"]}-{version}'
+    for file in project["files"]:
+        filename = file["filename"]
+        if not filename.startswith(prefix):
+            continue
+        suffix = filename[len(prefix) :]
+        if suffix == "" or suffix.startswith(("-", ".")):
+            yield file
+
+
+def pypi_sdist_for(project: PyPIProject, version: Version | str) -> Iterator[PyPIFile]:
+    for file in pypi_files_for(project, version):
+        if file["filename"].endswith((".tar.gz", ".zip")):
+            yield file
+
+
 async def update(metadata: Metadata) -> None:
     async with aiohttp.ClientSession() as session:
-        pypi_client = pypi.Client(session)
-
         async with asyncio.TaskGroup() as tg:
-            frida_task = tg.create_task(pypi_client.get_project("frida"))
-            frida_tools_task = tg.create_task(pypi_client.get_project("frida-tools"))
+            frida_task = tg.create_task(get_pypi_project(session, "frida"))
+            frida_tools_task = tg.create_task(get_pypi_project(session, "frida-tools"))
 
         frida = frida_task.result()
         frida_tools = frida_tools_task.result()
 
-        assert frida.versions, "frida has no versions"
-        assert frida_tools.versions, "frida-tools has no versions"
+        assert frida.get("versions", None), "frida has no versions"
+        assert frida_tools.get("versions", None), "frida-tools has no versions"
 
-        version = str(max(frida.versions))
-        tools_version = str(max(frida_tools.versions))
+        version = str(max(map(Version, frida["versions"])))
+        tools_version = str(max(map(Version, frida_tools["versions"])))
 
         print(f"frida v{version}", flush=True)
         print(f"frida-tools v{tools_version}", flush=True)
@@ -103,15 +142,11 @@ async def update(metadata: Metadata) -> None:
 
         sema = asyncio.BoundedSemaphore(os.cpu_count() or 1)
         async with asyncio.TaskGroup() as tg:
-            for devkit_or_binary in list(Devkit.__members__.values()) + list(
-                Binary.__members__.values()
-            ):
-                per_system = cast(
-                    PerSystemSourceFile, sources.setdefault(devkit_or_binary, {})
-                )
+            for prebuilt in Prebuilt.__members__.values():
+                per_system = cast(PerSystemSourceFile, sources.setdefault(prebuilt, {}))
                 for system in System.__members__.values():
                     source_file = per_system.setdefault(system, {})
-                    url = devkit_or_binary.download_url_for(system, version)
+                    url = prebuilt.download_url_for(system, version)
                     if source_file.get("url", url) != url:
                         source_file["hash"] = ""
                     source_file["url"] = url
@@ -119,18 +154,13 @@ async def update(metadata: Metadata) -> None:
                         tg.create_task(download_source_file(session, source_file, sema))
 
 
-def py_source_file(project: pypi.Project, version: str) -> SourceFile:
+def py_source_file(project: PyPIProject, version: str) -> SourceFile:
     sha256 = ""
-    for sdist in project.sdist_for(version):
-        sha256 = sdist.hashes.get("sha256", "")
-        if sha256 != "":
-            break
+    for file in pypi_sdist_for(project, version):
+        sha256 = file["hashes"].get("sha256", sha256)
     assert sha256, "no sdist with sha256 found"
-
-    source_file = SourceFile(
-        hash=f"sha256-{b64encode(unhexlify(sha256)).decode()}",
-    )
-    if project.name == "frida-tools":
+    source_file = SourceFile(hash=f"sha256-{b64encode(unhexlify(sha256)).decode()}")
+    if project["name"] == "frida-tools":
         source_file["version"] = version
     return source_file
 
@@ -144,7 +174,7 @@ async def download_source_file(
         url = source_file.get("url", None)
         assert url
 
-        print(f"downloading {url}", file=sys.stderr)
+        print(f"downloading {url}", file=sys.stderr, flush=True)
 
         resp = await session.get(url)
         resp.raise_for_status()
@@ -162,13 +192,13 @@ async def download_source_file(
 async def main() -> None:
     metadata = Metadata()
     with suppress(FileNotFoundError):
-        with open("metadata.json", "rb") as f:
+        with open(METADATA, "rb") as f:
             metadata.update(json.load(f))
 
     try:
         await update(metadata)
     finally:
-        with open("metadata.json", "w+") as f:
+        with open(METADATA, "w+") as f:
             json.dump(metadata, f, indent=2)
 
 

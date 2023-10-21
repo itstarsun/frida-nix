@@ -1,8 +1,9 @@
-{ version
-, hash
-
+{ lib
 , buildPythonPackage
 , fetchPypi
+
+, version
+, hash
 
 , colorama
 , frida
@@ -27,5 +28,12 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "frida_tools" ];
 
-  meta.mainProgram = "frida";
+  passthru.updateScript = ./update.py;
+
+  meta = with lib; {
+    description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers (CLI tools)";
+    homepage = "https://www.frida.re/";
+    license = licenses.wxWindows;
+    mainProgram = "frida";
+  };
 }

@@ -1,6 +1,6 @@
-{ stdenvNoCC, pname, version, src }:
+{ lib, stdenv, pname, version, src }:
 
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   inherit pname version src;
 
   dontUnpack = true;
@@ -12,4 +12,10 @@ stdenvNoCC.mkDerivation {
     chmod +x $out/bin/$pname
     runHook postInstall
   '';
+
+  meta = with lib; {
+    description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers";
+    homepage = "https://www.frida.re/";
+    license = licenses.wxWindows;
+  };
 }

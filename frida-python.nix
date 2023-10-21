@@ -1,8 +1,9 @@
-{ version
-, hash
-
+{ lib
 , buildPythonPackage
 , fetchPypi
+
+, version
+, hash
 
 , frida-core
 , typing-extensions
@@ -20,11 +21,15 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  configurePhase = ''
-    runHook preConfigure
+  postPatch = ''
     export FRIDA_CORE_DEVKIT=${frida-core}/share/frida-core
-    runHook postConfigure
   '';
 
   pythonImportsCheck = [ "frida" ];
+
+  meta = with lib; {
+    description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers (Python bindings)";
+    homepage = "https://www.frida.re/";
+    license = licenses.wxWindows;
+  };
 }

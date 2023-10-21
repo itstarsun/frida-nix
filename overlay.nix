@@ -3,17 +3,31 @@
 final: prev:
 
 let
-  frida = import ./. { inherit metadata; pkgs = prev; };
-  frida' = builtins.removeAttrs frida [ "metadata" ];
+  inherit (final)
+    lib
+    callPackage
+    ;
+
+  inherit (lib)
+    recurseIntoAttrs
+    ;
 in
 
-frida' // {
-  inherit frida;
+{
+  frida = recurseIntoAttrs (callPackage ./. { inherit metadata; });
+
+  frida-tools = with final.python3Packages; toPythonApplication frida-tools;
 
   pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-    (pythonPackages: _: {
-      frida = frida.frida-python.override { inherit pythonPackages; };
-      frida-tools = frida.frida-tools.override { inherit pythonPackages; };
-    })
+    (pythonPackages: _:
+      let
+        frida' = final.frida.override {
+          python3Packages = pythonPackages;
+        };
+      in
+      {
+        frida = frida'.frida-python;
+        frida-tools = frida'.frida-tools;
+      })
   ];
 }
