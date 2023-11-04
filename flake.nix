@@ -41,5 +41,20 @@
           default = frida-tools;
         }
       );
+
+      devShells = eachSystem (system:
+        let pkgs = nixpkgs.legacyPackages.${system}; in {
+          default = pkgs.mkShellNoCC {
+            packages = with pkgs; [
+              (python3.withPackages (p: with p; [
+                aiohttp
+                packaging
+              ]))
+              mypy
+              ruff
+            ];
+          };
+        }
+      );
     };
 }
