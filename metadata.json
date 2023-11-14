@@ -1,8 +1,8 @@
 {
-  "version": "16.1.5",
+  "version": "16.1.6",
   "sources": {
     "frida-python": {
-      "hash": "sha256-l9XDzQ2xahRKdp5vYSlnGxLccuMbYBe8Vvw8kTfC1RE="
+      "hash": "sha256-qcKWJoqzym0sCgZ3Bf0vy96S3CCwT9OKgOP8E/DYrP8="
     },
     "frida-tools": {
       "hash": "sha256-jtxn0a43kv9bLcY1CM3k0kf5K30Ne/FT10ohptWNwEU=",
@@ -10,92 +10,92 @@
     },
     "frida-core": {
       "aarch64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-core-devkit-16.1.5-macos-arm64.tar.xz",
-        "hash": "sha256-mueIKVYX0tCpDdgioSQbimFKLA1BlGWsdfBxKKM4Yoo="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-core-devkit-16.1.6-macos-arm64.tar.xz",
+        "hash": "sha256-ixDceEtciC51TFf9ecyh9X2fDZUaXnrevUXqcbMBidY="
       },
       "aarch64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-core-devkit-16.1.5-linux-arm64.tar.xz",
-        "hash": "sha256-6EPxpYTLGQB2HM+UB4hgmRHI3aW/AjfWaf4JlHy09gM="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-core-devkit-16.1.6-linux-arm64.tar.xz",
+        "hash": "sha256-pQ9c0iqOzbM5SDKLtEgSNxdEqVgXQrTSL3MWnUZKh+k="
       },
       "x86_64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-core-devkit-16.1.5-macos-x86_64.tar.xz",
-        "hash": "sha256-4sn/RWggAgDXZuVg7Um3A2e1NadF4Zy9Cmh4kNaJ0ik="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-core-devkit-16.1.6-macos-x86_64.tar.xz",
+        "hash": "sha256-SwWVuIx+xK33fVQKKAkyU0sGq4zEH3QafXIE2yF9Tuw="
       },
       "x86_64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-core-devkit-16.1.5-linux-x86_64.tar.xz",
-        "hash": "sha256-Epd3rRjl96rZTtaJcQwuXiNpzb/BOOiHRqYymYOK4MI="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-core-devkit-16.1.6-linux-x86_64.tar.xz",
+        "hash": "sha256-dbwfJzWE1owgsLtRhF37e51cZryO8gihlwTiZLdn5m0="
       }
     },
     "frida-gum": {
       "aarch64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gum-devkit-16.1.5-macos-arm64.tar.xz",
-        "hash": "sha256-KiAKMsFOQlEw9BiAtpfgY6MtJb0+LFLyZsC5ydgm4fw="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gum-devkit-16.1.6-macos-arm64.tar.xz",
+        "hash": "sha256-Z1TdghOAIcCaeVcHtMzN/JawcAmAZT6oBkjZOvHX7k8="
       },
       "aarch64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gum-devkit-16.1.5-linux-arm64.tar.xz",
-        "hash": "sha256-n/c77l3dKS1dc55/lOe4zm91FK3oXYN5Q6WM5JQSbKc="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gum-devkit-16.1.6-linux-arm64.tar.xz",
+        "hash": "sha256-LYR9+pSkO5jyCnshMstERV9w4qDpHXxKTis/HxVX0xo="
       },
       "x86_64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gum-devkit-16.1.5-macos-x86_64.tar.xz",
-        "hash": "sha256-57YION/Xm6a+il3hJjLEc5GwHf1t7zNfOk6CQH0GTSw="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gum-devkit-16.1.6-macos-x86_64.tar.xz",
+        "hash": "sha256-wnp+MjJqGnh9a2GLzA0s5eRK4D4JxcozN6suULbHMio="
       },
       "x86_64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gum-devkit-16.1.5-linux-x86_64.tar.xz",
-        "hash": "sha256-pPu5syNSDcRWWRFTBGyXyllyA8p1Oh2RMFtNOD1ALQE="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gum-devkit-16.1.6-linux-x86_64.tar.xz",
+        "hash": "sha256-lwbjyaV70V0NFDmBRQ8povG+F2+jeWLitMV8/0OyBs0="
       }
     },
     "frida-gumjs": {
       "aarch64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gumjs-devkit-16.1.5-macos-arm64.tar.xz",
-        "hash": "sha256-fCxAHDcudCMM/QKavWWpH3YHj2uAq8obFbUbvv/ukCA="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gumjs-devkit-16.1.6-macos-arm64.tar.xz",
+        "hash": "sha256-RXILbqkKmd3Pr1HAqbNoLw9avpdkwEN7O8dGQ3jGf7k="
       },
       "aarch64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gumjs-devkit-16.1.5-linux-arm64.tar.xz",
-        "hash": "sha256-AzTFEH9qWHA5Bwwy6ARfOAImR/dN8NXRN7BivnjeRNw="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gumjs-devkit-16.1.6-linux-arm64.tar.xz",
+        "hash": "sha256-fQ/tNnIDvbwKT75G3r5FINtuRtvkY3TvpSuJ+8pIyWs="
       },
       "x86_64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gumjs-devkit-16.1.5-macos-x86_64.tar.xz",
-        "hash": "sha256-4tZNc2GH1qVIZvCHVYzUn7z6kBPStnuftyxS3/3fDus="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gumjs-devkit-16.1.6-macos-x86_64.tar.xz",
+        "hash": "sha256-1i8Bwu0h3Jw30jc803/Hg2N9MpyN4dbtZne/EoOtV6w="
       },
       "x86_64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-gumjs-devkit-16.1.5-linux-x86_64.tar.xz",
-        "hash": "sha256-/qgduomGU4m+KlJCqh2K/tDxjVcRLuIzPBL3WY0Hg+I="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-gumjs-devkit-16.1.6-linux-x86_64.tar.xz",
+        "hash": "sha256-8XScJmFaWZpWx9wHCwup9VkSlYnrxM+UhTXQA5OJ23M="
       }
     },
     "frida-server": {
       "aarch64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-server-16.1.5-macos-arm64.xz",
-        "hash": "sha256-Nk99a6RCa4oU5XbBG3xOh1Lvo3l4yiGXqZvDJiSiCac="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-server-16.1.6-macos-arm64.xz",
+        "hash": "sha256-WYlXBy7v4QaFJdxLkJztKjDlsx5e43s8r1HJzMsxC6s="
       },
       "aarch64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-server-16.1.5-linux-arm64.xz",
-        "hash": "sha256-hg11FP8pNN7yzSoRSS81+AtMCCua+JxDxuRElwgGVbc="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-server-16.1.6-linux-arm64.xz",
+        "hash": "sha256-hMRPYsvHFEa71IsjAHzkCiv2/d1uHevnmvzaOJaZjLs="
       },
       "x86_64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-server-16.1.5-macos-x86_64.xz",
-        "hash": "sha256-AEY2/1yqbWRlx8Gxw8d6mna3i5wm3ksiEKAyXE+7S+I="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-server-16.1.6-macos-x86_64.xz",
+        "hash": "sha256-w4NLhdmi6kESo1eY8yZJlp1DHyqiE86t8wToMIJybXc="
       },
       "x86_64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-server-16.1.5-linux-x86_64.xz",
-        "hash": "sha256-lwTtH64RIEr4cHL2Xn3HDMYv/pnxiZ6EfiRMKnSwkUk="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-server-16.1.6-linux-x86_64.xz",
+        "hash": "sha256-TdiS5TFPqWVws5aaoWozuuYhPFipXIDnJbrZjLr23Xw="
       }
     },
     "frida-portal": {
       "aarch64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-portal-16.1.5-macos-arm64.xz",
-        "hash": "sha256-XL2DJ/TCk+QoPDdVQFF11NBf2wsow36K6wo6kU6Wc3E="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-portal-16.1.6-macos-arm64.xz",
+        "hash": "sha256-MnkUMjEQcNwB8ysFMtcQ9jfUd87PCTvBv2d4I/2AntQ="
       },
       "aarch64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-portal-16.1.5-linux-arm64.xz",
-        "hash": "sha256-fc0ao6hWWQ2jOMP/mw+/QgHR4gMWa3EziIhu/khXn4I="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-portal-16.1.6-linux-arm64.xz",
+        "hash": "sha256-l3bF11fFn30/ejC6rYaHSXLuvnvegFLCmgW6kk4qvqU="
       },
       "x86_64-darwin": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-portal-16.1.5-macos-x86_64.xz",
-        "hash": "sha256-GwJCnnnMFFz0Ckwt6ekAKU7dpVKfKzrxQX3d6b0ZHO0="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-portal-16.1.6-macos-x86_64.xz",
+        "hash": "sha256-PoHGCjUgUscKS+ZlFZ9qWph8XhgjhaNVbeiWtRaEVvg="
       },
       "x86_64-linux": {
-        "url": "https://github.com/frida/frida/releases/download/16.1.5/frida-portal-16.1.5-linux-x86_64.xz",
-        "hash": "sha256-KiX/aX7KNXLLBMSCtE/Gv74KQpqt1de5aaaTOa17bLc="
+        "url": "https://github.com/frida/frida/releases/download/16.1.6/frida-portal-16.1.6-linux-x86_64.xz",
+        "hash": "sha256-RwtoaXCmIMYFbiL4ZOgK5xFFD9oNPZclX03YCKY2Uc0="
       }
     }
   }
