@@ -12,10 +12,16 @@
 , npmHooks
 , pkg-config
 , python3
+
+, frida-gumjs-bindings ? null
 }:
 
 let
-  frida-gumjs-bindings = callPackage ./frida-gumjs-bindings { };
+  frida-gumjs-bindings' =
+    if frida-gumjs-bindings == null then
+      callPackage ./frida-gumjs-bindings { }
+    else
+      frida-gumjs-bindings;
 in
 
 stdenv.mkDerivation {
@@ -29,14 +35,14 @@ stdenv.mkDerivation {
     patchShebangs .
 
     mkdir -p build/bindings/gumjs
-    cp ${frida-gumjs-bindings}/package-lock.json build/bindings/gumjs
+    cp ${frida-gumjs-bindings'}/package-lock.json build/bindings/gumjs
   '';
 
   npmRoot = "build/bindings/gumjs";
-  npmDeps = frida-gumjs-bindings;
+  npmDeps = frida-gumjs-bindings';
 
   disallowedReferences = [
-    frida-gumjs-bindings
+    frida-gumjs-bindings'
   ];
 
   buildInputs = [
@@ -60,4 +66,8 @@ stdenv.mkDerivation {
   ];
 
   strictDeps = true;
+
+  passthru = {
+    frida-gumjs-bindings = frida-gumjs-bindings';
+  };
 }

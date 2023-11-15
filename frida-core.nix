@@ -71,4 +71,11 @@ stdenv.mkDerivation {
   ];
 
   strictDeps = true;
+
+  passthru = {
+    inherit
+      frida-barebone-script-runtime
+      frida-compiler-agent
+      ;
+  };
 }

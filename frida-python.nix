@@ -78,4 +78,8 @@ buildPythonPackage {
   ];
 
   strictDeps = true;
+
+  passthru = {
+    inherit extension;
+  };
 }
