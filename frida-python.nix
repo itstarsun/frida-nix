@@ -47,7 +47,7 @@ let
 in
 
 buildPythonPackage {
-  pname = "frida-python-extension";
+  pname = "frida";
   inherit version src;
   sourceRoot = "${src.name}/frida-python";
 
