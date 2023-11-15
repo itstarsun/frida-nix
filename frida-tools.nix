@@ -1,5 +1,7 @@
 { buildPythonPackage
 , fetchPypi
+, version
+, hash
 
 , colorama
 , frida
@@ -9,11 +11,10 @@
 
 buildPythonPackage rec {
   pname = "frida-tools";
-  version = "12.3.0";
+  inherit version;
 
   src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-jtxn0a43kv9bLcY1CM3k0kf5K30Ne/FT10ohptWNwEU=";
+    inherit pname version hash;
   };
 
   propagatedBuildInputs = [

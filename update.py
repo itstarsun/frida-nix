@@ -10,11 +10,12 @@ import json
 import re
 import subprocess
 from base64 import b64encode
+from binascii import unhexlify
 from contextlib import AsyncExitStack, suppress
 from enum import ReprEnum
 from hashlib import sha256
 from pathlib import Path
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Iterator, Literal, TypedDict, cast
 
 from aiohttp import ClientSession
 
@@ -39,9 +40,15 @@ class System(tuple[str, str], ReprEnum):
 class Metadata(TypedDict, total=False):
     version: str
     repo: str
+    tools: Tools
     barebone: str
     compiler: str
     deps: Deps
+
+
+class Tools(TypedDict, total=False):
+    version: str
+    hash: str
 
 
 class Deps(TypedDict, total=False):
@@ -158,6 +165,52 @@ async def _update_gumjs_bindings(gumjs_bindings_src: Path) -> None:
     )
 
 
+class PyPIProject(TypedDict):
+    name: str
+    files: list[PyPIFile]
+    versions: list[str]
+
+
+class PyPIFile(TypedDict):
+    filename: str
+    url: str
+    hashes: dict[str, str]
+
+
+async def get_pypi_project(session: ClientSession, name: str) -> PyPIProject:
+    async with session.get(
+        f"https://pypi.org/simple/{name}/",
+        headers={"Accept": "application/vnd.pypi.simple.v1+json"},
+    ) as resp:
+        resp.raise_for_status()
+        return cast(PyPIProject, await resp.json())
+
+
+def pypi_files_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
+    prefix = f'{project["name"]}-{version}'
+    for file in project["files"]:
+        filename = file["filename"]
+        if not filename.startswith(prefix):
+            continue
+        suffix = filename[len(prefix) :]
+        if suffix == "" or suffix.startswith(("-", ".")):
+            yield file
+
+
+def pypi_sdist_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
+    for file in pypi_files_for(project, version):
+        if file["filename"].endswith((".tar.gz", ".zip")):
+            yield file
+
+
+def _py_sdist_hash(project: PyPIProject, version: str) -> str:
+    sha256 = ""
+    for file in pypi_sdist_for(project, version):
+        sha256 = file["hashes"].get("sha256", sha256)
+    assert sha256, "no sdist with sha256 found"
+    return f"sha256-{b64encode(unhexlify(sha256)).decode()}"
+
+
 async def main(metadata: Metadata, version: str | None) -> Metadata:
     async with AsyncExitStack() as exit_stack:
         session = await exit_stack.enter_async_context(ClientSession())
@@ -174,6 +227,17 @@ async def main(metadata: Metadata, version: str | None) -> Metadata:
         repo_path = Path(repo["path"])
 
         metadata["repo"] = repo["hash"]
+
+        tools_setup = repo_path / "frida-tools" / "setup.py"
+        tools_version_match = re.search(r'version="([^"]*)"', tools_setup.read_text())
+        assert tools_version_match, "failed to find version in setup.py"
+        tools_version = tools_version_match.group(1)
+
+        frida_tools = await get_pypi_project(session, "frida-tools")
+        metadata["tools"] = Tools(
+            version=tools_version,
+            hash=_py_sdist_hash(frida_tools, tools_version),
+        )
 
         frida_core_src = repo_path / "frida-core" / "src"
         async with asyncio.TaskGroup() as task_group:
@@ -223,4 +287,4 @@ if __name__ == "__main__":
     try:
         metadata = asyncio.run(main(metadata, args.version))
     finally:
-        METADATA.write_text(json.dumps(metadata, indent=2))
+        METADATA.write_text(json.dumps(metadata, indent=2) + "\n")

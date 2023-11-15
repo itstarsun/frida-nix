@@ -11,6 +11,7 @@ let
   inherit (metadata)
     version
     repo
+    tools
     barebone
     compiler
     deps
@@ -51,6 +52,7 @@ in
       ;
   };
   frida-tools = python3Packages.callPackage ./frida-tools.nix {
+    inherit (tools) version hash;
     frida = frida-python;
   };
 
