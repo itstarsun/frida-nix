@@ -21,6 +21,7 @@
         in
         {
           inherit (frida)
+            frida-core
             frida-gum
 
             frida-sdk
