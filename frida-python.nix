@@ -15,6 +15,8 @@
 , python
 
 , typing-extensions
+
+, coreutils
 }:
 
 let
@@ -68,6 +70,7 @@ buildPythonPackage {
 
   preCheck = ''
     autoPatchelf tests
+    sed -i 's|/bin/cat|${coreutils}/bin/cat|' tests/data/__init__.py
   '';
 
   pythonImportsCheck = [
