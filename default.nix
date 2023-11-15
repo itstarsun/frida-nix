@@ -2,6 +2,7 @@
 , stdenv
 , newScope
 , fetchFromGitHub
+, python3Packages
 }:
 
 let
@@ -37,6 +38,15 @@ in
 
   frida-core = callPackage ./frida-core.nix { inherit version; };
   frida-gum = callPackage ./frida-gum.nix { inherit version; };
+
+  frida-python = callPackage ./frida-python.nix {
+    inherit version;
+    inherit (python3Packages)
+      buildPythonPackage
+      python
+      typing-extensions
+      ;
+  };
 
   frida-sdk = mkFridaBundle "sdk";
   frida-toolchain = mkFridaBundle "toolchain";

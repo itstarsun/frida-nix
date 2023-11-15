@@ -24,6 +24,8 @@
             frida-core
             frida-gum
 
+            frida-python
+
             frida-sdk
             frida-toolchain
             ;
