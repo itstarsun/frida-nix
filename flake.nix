@@ -16,6 +16,8 @@
           (system: f nixpkgs.legacyPackages.${system});
     in
     {
+      overlays.default = import ./overlay.nix;
+
       packages = eachSystem (pkgs:
         let
           frida = pkgs.callPackage ./. { };
