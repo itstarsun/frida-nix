@@ -48,5 +48,22 @@
           default = pkgs.frida-tools;
         }
       );
+
+      devShells = eachSystem ({ pkgs, ... }: {
+        default = pkgs.mkShellNoCC {
+          packages = with pkgs; [
+            (python3.withPackages (p: with p; [
+              aiohttp
+            ]))
+            mypy
+            ruff
+
+            nodejs
+
+            nix-prefetch-git
+            prefetch-npm-deps
+          ];
+        };
+      });
     };
 }
