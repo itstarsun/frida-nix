@@ -35,6 +35,8 @@ in
     fetchSubmodules = true;
   };
 
+  frida-gum = callPackage ./frida-gum.nix { inherit version; };
+
   frida-sdk = mkFridaBundle "sdk";
   frida-toolchain = mkFridaBundle "toolchain";
 })
