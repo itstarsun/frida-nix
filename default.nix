@@ -3,23 +3,18 @@
 , newScope
 , fetchFromGitHub
 , python3Packages
+
+, metadata ? builtins.fromJSON (builtins.readFile ./metadata.json)
 }:
 
 let
-  version = "16.1.6";
-  deps = {
-    version = "20230622";
-    bundles = {
-      aarch64-linux = {
-        sdk = "sha256-Dv1dl6GnvHJciTHN6FzqOdqLTWus/RmASQkh4ZeCgW8=";
-        toolchain = "sha256-ufXdUubobh3LMLPWmaGyiwVuz5ZMY/i5+5QO3sqNeGY=";
-      };
-      x86_64-linux = {
-        sdk = "sha256-mM6hEMFQUfi4apeR4UVkNf2Jd4vanfHEyFLAADpx69E=";
-        toolchain = "sha256-6FaKEK8YYXnYA+bHk+QSNmud6q0Hac1BuLBQHoSfaFQ=";
-      };
-    };
-  };
+  inherit (metadata)
+    version
+    repo
+    barebone
+    compiler
+    deps
+    ;
 in
 
 lib.makeScope newScope (self: with self;
@@ -35,13 +30,17 @@ in
   src = fetchFromGitHub {
     owner = "frida";
     repo = "frida";
-    rev = version;
+    rev = repo;
     hash = "sha256-LLrcJ04wcn6CQ/8NzLdAz6LWyc/jaQgj67bIscMMtMA=";
     fetchSubmodules = true;
   };
 
-  frida-core = callPackage ./frida-core.nix { inherit version; };
-  frida-gum = callPackage ./frida-gum.nix { inherit version; };
+  frida-core = callPackage ./frida-core.nix {
+    inherit version barebone compiler;
+  };
+  frida-gum = callPackage ./frida-gum.nix {
+    inherit version;
+  };
 
   frida-python = callPackage ./frida-python.nix {
     inherit version;

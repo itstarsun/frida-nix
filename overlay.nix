@@ -1,3 +1,5 @@
+{ metadata ? builtins.fromJSON (builtins.readFile ./metadata.json) }:
+
 final: prev:
 
 let
@@ -12,7 +14,7 @@ let
 in
 
 {
-  frida = recurseIntoAttrs (callPackage ./. { });
+  frida = recurseIntoAttrs (callPackage ./. { inherit metadata; });
 
   frida-tools = with final.python3Packages; toPythonApplication frida-tools;
 

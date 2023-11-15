@@ -2,6 +2,8 @@
 , stdenv
 , callPackage
 , version
+, barebone
+, compiler
 , src
 
 , frida-gum
@@ -18,10 +20,12 @@
 let
   frida-barebone-script-runtime = callPackage ./frida-barebone-script-runtime {
     src = "${src}/frida-core/src/barebone";
+    hash = barebone;
   };
 
   frida-compiler-agent = callPackage ./frida-compiler-agent {
     src = "${src}/frida-core/src/compiler";
+    hash = compiler;
   };
 in
 

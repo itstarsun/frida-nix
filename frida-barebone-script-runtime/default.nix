@@ -1,4 +1,4 @@
-{ lib, buildNpmPackage, src }:
+{ lib, buildNpmPackage, src, hash }:
 
 let
   package = lib.importJSON "${src}/package.json";
@@ -9,7 +9,7 @@ buildNpmPackage {
   inherit (package) version;
 
   inherit src;
-  npmDepsHash = "sha256-QLeJ4/kC+2a7QQY20c3u1CqLgxuFmz6uc9n4laNAY4g=";
+  npmDepsHash = hash;
 
   postInstall = ''
     mkdir -p $out/share/$pname
