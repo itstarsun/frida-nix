@@ -25,10 +25,13 @@
             frida-gum
 
             frida-python
+            frida-tools
 
             frida-sdk
             frida-toolchain
             ;
+
+          default = frida.frida-tools;
         }
       );
     };

@@ -47,6 +47,9 @@ in
       typing-extensions
       ;
   };
+  frida-tools = python3Packages.callPackage ./frida-tools.nix {
+    frida = frida-python;
+  };
 
   frida-sdk = mkFridaBundle "sdk";
   frida-toolchain = mkFridaBundle "toolchain";
