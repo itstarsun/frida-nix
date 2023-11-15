@@ -13,28 +13,39 @@
 
       eachSystem = f:
         nixpkgs.lib.genAttrs systems
-          (system: f nixpkgs.legacyPackages.${system});
+          (system: f {
+            inherit system;
+            pkgs = nixpkgs.legacyPackages.${system};
+          });
     in
     {
       overlays.default = import ./overlay.nix;
 
-      packages = eachSystem (pkgs:
+      packages = eachSystem ({ system, ... }:
         let
-          frida = pkgs.callPackage ./. { };
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [
+              self.overlays.default
+            ];
+          };
         in
         {
-          inherit (frida)
+          inherit (pkgs)
+            frida-tools
+            ;
+
+          inherit (pkgs.frida)
             frida-core
             frida-gum
-
-            frida-python
-            frida-tools
 
             frida-sdk
             frida-toolchain
             ;
 
-          default = frida.frida-tools;
+          frida-python = pkgs.python3Packages.frida;
+
+          default = pkgs.frida-tools;
         }
       );
     };
