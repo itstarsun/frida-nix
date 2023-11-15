@@ -13,6 +13,7 @@ let
   isToolchian = name == "toolchain";
 
   system = {
+    aarch64-linux = "linux-arm64";
     x86_64-linux = "linux-x86_64";
   }.${stdenv.system};
 in

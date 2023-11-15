@@ -10,6 +10,10 @@ let
   deps = {
     version = "20230622";
     bundles = {
+      aarch64-linux = {
+        sdk = "sha256-Dv1dl6GnvHJciTHN6FzqOdqLTWus/RmASQkh4ZeCgW8=";
+        toolchain = "sha256-ufXdUubobh3LMLPWmaGyiwVuz5ZMY/i5+5QO3sqNeGY=";
+      };
       x86_64-linux = {
         sdk = "sha256-mM6hEMFQUfi4apeR4UVkNf2Jd4vanfHEyFLAADpx69E=";
         toolchain = "sha256-6FaKEK8YYXnYA+bHk+QSNmud6q0Hac1BuLBQHoSfaFQ=";
