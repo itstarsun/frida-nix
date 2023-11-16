@@ -31,8 +31,8 @@ in
   src = fetchFromGitHub {
     owner = "frida";
     repo = "frida";
-    rev = repo;
-    hash = "sha256-LLrcJ04wcn6CQ/8NzLdAz6LWyc/jaQgj67bIscMMtMA=";
+    rev = version;
+    hash = repo;
     fetchSubmodules = true;
   };
 
