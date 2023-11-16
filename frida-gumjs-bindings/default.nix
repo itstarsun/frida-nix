@@ -5,5 +5,5 @@ fetchNpmDeps {
     filter = name: type: type == "directory" || !lib.hasSuffix ".nix" (baseNameOf name);
     src = lib.cleanSource ./.;
   };
-  hash = "sha256-4/1whI8/3OYvla3wFDogBMm4bXVgrmnkdPmFh/ZPcw4=";
+  hash = "sha256-6shXsLsfCQdlU0Y0Z0y/rq5BX8+SCvGJOrt/g8TLTCw=";
 }

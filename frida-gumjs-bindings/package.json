@@ -4,7 +4,7 @@
   "dependencies": {
     "frida-compile": "^10.2.5",
     "frida-java-bridge": "6.2.5",
-    "frida-objc-bridge": "7.0.4",
+    "frida-objc-bridge": "7.0.5",
     "frida-swift-bridge": "2.0.7"
   }
 }
