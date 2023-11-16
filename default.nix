@@ -26,6 +26,11 @@ let
       inherit (deps) version;
       hash = deps.bundles.${stdenv.system}.${name};
     };
+
+  mkFridaDevkit = { drv, kit ? drv.pname }:
+    callPackage ./devkit.nix {
+      inherit drv kit;
+    };
 in
 {
   src = fetchFromGitHub {
@@ -42,6 +47,10 @@ in
   frida-gum = callPackage ./frida-gum.nix {
     inherit version;
   };
+
+  frida-core-devkit = mkFridaDevkit { drv = frida-core; };
+  frida-gum-devkit = mkFridaDevkit { drv = frida-gum; };
+  frida-gumjs-devkit = mkFridaDevkit { drv = frida-gum; kit = "frida-gumjs"; };
 
   frida-python = callPackage ./frida-python.nix {
     inherit version;

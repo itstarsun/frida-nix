@@ -38,6 +38,10 @@
             frida-core
             frida-gum
 
+            frida-core-devkit
+            frida-gum-devkit
+            frida-gumjs-devkit
+
             frida-sdk
             frida-toolchain
             ;
