@@ -6,16 +6,23 @@ import shlex
 from collections import OrderedDict
 from pathlib import Path
 from subprocess import check_output
+from tempfile import NamedTemporaryFile
 
 AR = os.getenv("AR", "ar")
 CC = os.getenv("CC", "gcc")
+NM = os.getenv("NM", "nm")
+OBJCOPY = os.getenv("OBJCOPY", "objcopy")
 PKG_CONFIG = os.getenv("PKG_CONFIG", "pkg-config")
 
 
 INCLUDE_PATTERN = re.compile(r'#include\s+[<"](.*?)[>"]')
 
 
-def generate_header(package: str, umbrella_header: str) -> str:
+def generate_header(
+    package: str,
+    umbrella_header: str,
+    thirdparty_symbol_mappings: list[tuple[str, str]],
+) -> str:
     cflags = shlex.split(
         check_output([PKG_CONFIG, "--cflags", package], text=True).strip()
     )
@@ -62,10 +69,48 @@ def generate_header(package: str, umbrella_header: str) -> str:
     ingest_header(all_header_files[0])
 
     devkit_header = "".join(devkit_header_lines)
+
+    if len(thirdparty_symbol_mappings) > 0:
+        public_mappings: list[tuple[str, str]] = []
+        for original, renamed in extract_public_thirdparty_symbol_mappings(
+            thirdparty_symbol_mappings
+        ):
+            public_mappings.append((original, renamed))
+            if (
+                f"define {original}" not in devkit_header
+                and f"define  {original}" not in devkit_header
+            ):
+                continue
+
+            def fixup_macro(match: re.Match[str]) -> str:
+                prefix = match.group(1)
+                suffix = re.sub(f"\\b{original}\\b", renamed, match.group(2))
+                return f"#undef {original}\n{prefix}{original}{suffix}"
+
+            devkit_header = re.sub(
+                r"^([ \t]*#[ \t]*define[ \t]*){0}\b((.*\\\n)*.*)$".format(original),
+                fixup_macro,
+                devkit_header,
+                flags=re.MULTILINE,
+            )
+
+        config += "#ifndef __FRIDA_SYMBOL_MAPPINGS__\n"
+        config += "#define __FRIDA_SYMBOL_MAPPINGS__\n\n"
+        config += (
+            "\n".join(
+                [
+                    f"#define {original} {renamed}"
+                    for original, renamed in public_mappings
+                ]
+            )
+            + "\n\n"
+        )
+        config += "#endif\n\n"
+
     return config + devkit_header
 
 
-def generate_library(package: str, output: Path) -> None:
+def generate_library(package: str, output: Path) -> list[tuple[str, str]]:
     library_flags = shlex.split(
         check_output(
             [PKG_CONFIG, "--static", "--libs", package],
@@ -82,6 +127,73 @@ def generate_library(package: str, output: Path) -> None:
         mri.append(f"addlib {path}")
     mri += ["save", "end"]
     check_output([AR, "-M"], input="\n".join(mri), text=True)
+
+    thirdparty_symbol_mappings = get_thirdparty_symbol_mappings(str(output))
+    renames = (
+        "\n".join(
+            [
+                f"{original} {renamed}"
+                for original, renamed in thirdparty_symbol_mappings
+            ]
+        )
+        + "\n"
+    )
+    with NamedTemporaryFile() as renames_file:
+        renames_file.write(renames.encode("utf-8"))
+        renames_file.flush()
+        check_output([OBJCOPY, f"--redefine-syms={renames_file.name}", str(output)])
+
+    return thirdparty_symbol_mappings
+
+
+def extract_public_thirdparty_symbol_mappings(
+    mappings: list[tuple[str, str]],
+) -> list[tuple[str, str]]:
+    public_prefixes = ["g_", "glib_", "gobject_", "gio_", "gee_", "json_", "cs_"]
+    return [
+        (original, renamed)
+        for original, renamed in mappings
+        if any([original.startswith(prefix) for prefix in public_prefixes])
+    ]
+
+
+def get_thirdparty_symbol_mappings(library: str) -> list[tuple[str, str]]:
+    return [(name, "_frida_" + name) for name in get_thirdparty_symbol_names(library)]
+
+
+def get_thirdparty_symbol_names(library: str) -> list[str]:
+    visible_names = list(
+        set(
+            [
+                name
+                for kind, name in get_symbols(library)
+                if kind in ("T", "D", "B", "R", "C")
+            ]
+        )
+    )
+    visible_names.sort()
+
+    frida_prefixes = ["frida", "_frida", "gum", "_gum"]
+    thirdparty_names = [
+        name
+        for name in visible_names
+        if not any([name.startswith(prefix) for prefix in frida_prefixes])
+    ]
+
+    return thirdparty_names
+
+
+def get_symbols(library: str) -> list[tuple[str, str]]:
+    result: list[tuple[str, str]] = []
+
+    for line in check_output([NM, library], text=True).strip().split("\n"):
+        tokens = line.split(" ")
+        if len(tokens) < 3:
+            continue
+        (kind, name) = tokens[-2:]
+        result.append((kind, name))
+
+    return result
 
 
 def infer_library_dirs(flags: list[str]) -> list[Path]:
@@ -132,20 +244,22 @@ if __name__ == "__main__":
     package = args.kit + "-1.0"
     match args.kit:
         case "frida-core":
-            header = args.include / "frida-1.0" / "frida-core.h"
+            umbrella_header = args.include / "frida-1.0" / "frida-core.h"
         case "frida-gum":
-            header = args.include / "frida-1.0" / "gum" / "gum.h"
+            umbrella_header = args.include / "frida-1.0" / "gum" / "gum.h"
         case "frida-gumjs":
-            header = args.include / "frida-1.0" / "gumjs" / "gumjs.h"
+            umbrella_header = args.include / "frida-1.0" / "gumjs" / "gumjs.h"
         case _:
             raise ValueError(f"unknown kit: {args.kit}")
 
     output = Path(args.output)
 
-    include = Path(output / "include" / (args.kit + ".h"))
-    include.parent.mkdir(parents=True, exist_ok=True)
-    include.write_text(generate_header(package, header))
-
     lib = Path(output / "lib" / ("lib" + args.kit + ".a"))
     lib.parent.mkdir(parents=True, exist_ok=True)
-    generate_library(package, lib)
+    thirdparty_symbol_mappings = generate_library(package, lib)
+
+    include = Path(output / "include" / (args.kit + ".h"))
+    include.parent.mkdir(parents=True, exist_ok=True)
+    include.write_text(
+        generate_header(package, umbrella_header, thirdparty_symbol_mappings)
+    )
