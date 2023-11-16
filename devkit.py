@@ -146,6 +146,6 @@ if __name__ == "__main__":
     include.parent.mkdir(parents=True, exist_ok=True)
     include.write_text(generate_header(package, header))
 
-    lib = Path(output / "lib" / (args.kit + ".a"))
+    lib = Path(output / "lib" / ("lib" + args.kit + ".a"))
     lib.parent.mkdir(parents=True, exist_ok=True)
     generate_library(package, lib)
