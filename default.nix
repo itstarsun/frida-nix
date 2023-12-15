@@ -3,6 +3,7 @@
 , newScope
 , fetchFromGitHub
 , python3Packages
+, symlinkJoin
 
 , metadata ? builtins.fromJSON (builtins.readFile ./metadata.json)
 }:
@@ -67,4 +68,12 @@ in
 
   frida-sdk = mkFridaBundle "sdk";
   frida-toolchain = mkFridaBundle "toolchain";
+
+  frida-sdk-with-toolchain = symlinkJoin {
+    name = "frida-sdk-with-toolchain";
+    paths = [
+      frida-sdk
+      frida-toolchain
+    ];
+  };
 })

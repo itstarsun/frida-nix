@@ -7,7 +7,7 @@
 , autoPatchelfHook
 , frida-core
 , frida-gum
-, frida-sdk
+, frida-sdk-with-toolchain
 , frida-toolchain
 , meson
 , ninja
@@ -25,10 +25,16 @@ let
     inherit version src;
     sourceRoot = "${src.name}/frida-python";
 
+    disallowedReferences = [
+      frida-core
+      frida-gum
+      frida-sdk-with-toolchain
+    ];
+
     buildInputs = [
       frida-core
       frida-gum
-      frida-sdk
+      frida-sdk-with-toolchain
     ];
 
     nativeBuildInputs = [
@@ -39,7 +45,7 @@ let
     ];
 
     mesonFlags = [
-      (lib.mesonOption "python_incdir" "${python}/include/python${python.pythonVersion}")
+      (lib.mesonOption "python_incdir" "${python}/include/${python.libPrefix}")
     ];
 
     strictDeps = true;
@@ -53,7 +59,7 @@ buildPythonPackage {
 
   postPatch = ''
     export FRIDA_VERSION=${version}
-    export FRIDA_EXTENSION=${extension}/lib/python${python.pythonVersion}/site-packages/_frida.so
+    export FRIDA_EXTENSION=${extension}/${python.sitePackages}/_frida.so
   '';
 
   disallowedReferences = [

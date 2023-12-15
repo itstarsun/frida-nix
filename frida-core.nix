@@ -8,6 +8,7 @@
 
 , frida-gum
 , frida-sdk
+, frida-sdk-with-toolchain
 , frida-toolchain
 , meson
 , ninja
@@ -53,9 +54,16 @@ stdenv.mkDerivation {
   npmRoot = "build/src/compiler";
   npmDeps = frida-compiler-agent;
 
+  disallowedReferences = [
+    frida-barebone-script-runtime
+    frida-compiler-agent
+    frida-gum
+    frida-sdk-with-toolchain
+  ];
+
   buildInputs = [
     frida-gum
-    frida-sdk
+    frida-sdk-with-toolchain
   ];
 
   nativeBuildInputs = [

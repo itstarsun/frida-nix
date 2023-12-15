@@ -44,6 +44,8 @@
 
             frida-sdk
             frida-toolchain
+
+            frida-sdk-with-toolchain
             ;
 
           frida-python = pkgs.python3Packages.frida;

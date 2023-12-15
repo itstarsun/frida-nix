@@ -4,7 +4,7 @@
 , version
 , src
 
-, frida-sdk
+, frida-sdk-with-toolchain
 , frida-toolchain
 , meson
 , ninja
@@ -42,11 +42,12 @@ stdenv.mkDerivation {
   npmDeps = frida-gumjs-bindings';
 
   disallowedReferences = [
+    frida-sdk-with-toolchain
     frida-gumjs-bindings'
   ];
 
   buildInputs = [
-    frida-sdk
+    frida-sdk-with-toolchain
   ];
 
   nativeBuildInputs = [
