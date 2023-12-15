@@ -1,22 +1,22 @@
 {
-  "version": "16.1.7",
-  "repo": "sha256-p9vmZifLBaPdSbQwZPKNdqYI8Oqxy8t4PVD51DE6xrE=",
+  "version": "16.1.8",
+  "repo": "sha256-FAUebH41L5MAnBGYVGMyMxSDnrMO/do5kUBAYlHs7zg=",
   "tools": {
     "version": "12.3.0",
     "hash": "sha256-jtxn0a43kv9bLcY1CM3k0kf5K30Ne/FT10ohptWNwEU="
   },
   "barebone": "sha256-QLeJ4/kC+2a7QQY20c3u1CqLgxuFmz6uc9n4laNAY4g=",
-  "compiler": "sha256-CJX1ApWlzIuuPGRr8bCSCpk/TsFaL380rCO5Aoc9cYM=",
+  "compiler": "sha256-LSlGYKdhGjGc6k0v1YqkR6pxuTrEYs7LtoUKP5127fM=",
   "deps": {
-    "version": "20231116",
+    "version": "20231124",
     "bundles": {
       "aarch64-linux": {
-        "sdk": "sha256-p+yAk1XVAY0htCpMAM73iWRqjhqQ32ZvcDPFqW7bLwM=",
-        "toolchain": "sha256-L/I4rqy15/xINZBuXGvD/c2hkpzmp9WftQdoTe9L0Lk="
+        "sdk": "sha256-SO9J/oWAIuxMjJ8red7kMZmABKp+a1xoz7W5NPHQm4Y=",
+        "toolchain": "sha256-EeVT6Tn+54z+0dNhEsxMfhvD8bFyGeFvftFnVT5PECU="
       },
       "x86_64-linux": {
-        "sdk": "sha256-qRaIAwpl8viACYKDYMQqzYYA7cF8mF0cTmdxmlcB9Mo=",
-        "toolchain": "sha256-cBvZKWVSEqVAGfuKLyo9WhxFFEByOhh0nBSoI2oDaYI="
+        "sdk": "sha256-uHY+XDhllSwej7B2thzApphGxc3SZ936f3GPZHqSLnE=",
+        "toolchain": "sha256-uwajoHDngdoqf/7u/vCWM9moKXc1Jmf1IosUukO4l1k="
       }
     }
   }
