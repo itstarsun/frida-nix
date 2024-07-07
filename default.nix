@@ -28,8 +28,8 @@ devkits // binaries // {
   inherit metadata;
 
   frida-python = python3Packages.callPackage ./frida-python.nix {
-    inherit version frida-core;
-    inherit (sources.frida-python) hash;
+    inherit version;
+    wheels = sources.frida-python;
   };
 
   frida-tools = python3Packages.callPackage ./frida-tools.nix {

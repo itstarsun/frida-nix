@@ -1,29 +1,35 @@
 { lib
+, hostPlatform
 , buildPythonPackage
 , fetchPypi
 
 , version
-, hash
+, wheels
 
-, frida-core
+, python3
 , typing-extensions
 }:
+
+let
+  wheel = wheels.${hostPlatform.system};
+in
 
 buildPythonPackage rec {
   pname = "frida";
   inherit version;
 
+  format = "wheel";
+
   src = fetchPypi {
-    inherit pname version hash;
+    inherit pname version format;
+    inherit (wheel) python platform hash;
+    dist = wheel.python;
+    abi = "abi3";
   };
 
-  propagatedBuildInputs = [
+  propagatedBuildInputs = lib.optional (!python3.pythonAtLeast "3.11") [
     typing-extensions
   ];
-
-  postPatch = ''
-    export FRIDA_CORE_DEVKIT=${frida-core}/share/frida-core
-  '';
 
   pythonImportsCheck = [ "frida" ];
 

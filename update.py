@@ -39,6 +39,21 @@ class System(StrEnum):
             case System.X86_64_LINUX:
                 return "linux-x86_64"
 
+    @property
+    def pypi_system(self) -> str:
+        if self.endswith("darwin"):
+            return "macosx"
+        elif self.endswith("linux"):
+            return "manylinux"
+        raise NotImplementedError
+
+    @property
+    def pypi_arch(self) -> str:
+        (arch, system) = self.split("-")
+        if arch == "aarch64" and system == "darwin":
+            return "arm64"
+        return arch
+
 
 class Prebuilt(StrEnum):
     FRIDA_CORE = "frida-core"
@@ -70,7 +85,15 @@ class SourceFile(TypedDict, total=False):
     version: str
 
 
-PerSystemSourceFile = NewType("PerSystemSourceFile", dict[System, SourceFile])
+class WheelFile(TypedDict):
+    python: str
+    platform: str
+    hash: str
+
+
+PerSystemSourceFile = NewType(
+    "PerSystemSourceFile", dict[System, SourceFile | WheelFile]
+)
 
 
 class PyPIProject(TypedDict):
@@ -111,6 +134,12 @@ def pypi_sdist_for(project: PyPIProject, version: Version | str) -> Iterator[PyP
             yield file
 
 
+def pypi_wheels_for(project: PyPIProject, version: Version | str) -> Iterator[PyPIFile]:
+    for file in pypi_files_for(project, version):
+        if file["filename"].endswith(".whl"):
+            yield file
+
+
 async def update(metadata: Metadata) -> None:
     async with aiohttp.ClientSession() as session:
         async with asyncio.TaskGroup() as tg:
@@ -137,7 +166,11 @@ async def update(metadata: Metadata) -> None:
 
         sources = metadata.setdefault("sources", {})
 
-        sources["frida-python"] = py_source_file(frida, version)
+        frida_python = PerSystemSourceFile({})
+        for system in System.__members__.values():
+            frida_python[system] = py_wheel_file(frida, version, system)
+
+        sources["frida-python"] = frida_python
         sources["frida-tools"] = py_source_file(frida_tools, tools_version)
 
         sema = asyncio.BoundedSemaphore(os.cpu_count() or 1)
@@ -145,7 +178,7 @@ async def update(metadata: Metadata) -> None:
             for prebuilt in Prebuilt.__members__.values():
                 per_system = cast(PerSystemSourceFile, sources.setdefault(prebuilt, {}))
                 for system in System.__members__.values():
-                    source_file = per_system.setdefault(system, {})
+                    source_file = cast(SourceFile, per_system.setdefault(system, {}))
                     url = prebuilt.download_url_for(system, version)
                     if source_file.get("url", url) != url:
                         source_file["hash"] = ""
@@ -163,6 +196,38 @@ def py_source_file(project: PyPIProject, version: str) -> SourceFile:
     if project["name"] == "frida-tools":
         source_file["version"] = version
     return source_file
+
+
+def py_wheel_file(project: PyPIProject, version: str, system: System) -> WheelFile:
+    candidates = []
+
+    prefix = f'{project["name"]}-{version}-'
+    for file in pypi_wheels_for(project, version):
+        filename = file["filename"][len(prefix) :]
+        (filename, _) = filename.rsplit(".whl", 2)
+
+        (python, abi, platform) = filename.split("-", 3)
+        if not platform.startswith(system.pypi_system):
+            continue
+        if not platform.endswith(system.pypi_arch):
+            continue
+
+        sha256 = file["hashes"].get("sha256", None)
+        assert sha256, "wheel file has no sha256"
+        hash = f"sha256-{b64encode(unhexlify(sha256)).decode()}"
+
+        if system.endswith("linux") and (
+            platform.startswith("manylinux1") or platform.startswith("manylinux2014")
+        ):
+            return WheelFile(python=python, platform=platform, hash=hash)
+
+        candidates.append((python, abi, platform, hash))
+
+    if len(candidates) != 1:
+        raise ValueError(f"no matching wheel file found for {system}")
+
+    (python, abi, platform, hash) = candidates[0]
+    return WheelFile(python=python, platform=platform, hash=hash)
 
 
 async def download_source_file(
