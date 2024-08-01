@@ -1,39 +1,42 @@
-{ metadata ? builtins.fromJSON (builtins.readFile ./metadata.json)
-, lib
+{ lib
 , system
 , newScope
 , fetchurl
 , python3Packages
+, manifest ? lib.importJSON ./manifest.json
 }:
 
 lib.makeScope newScope (self: with self;
 let
-  inherit (metadata) version sources;
+  version = manifest._version;
+  inherit (manifest) artifacts;
 
   mkFridaDevkitOrBinary = path: pname:
     callPackage path {
       inherit pname version;
       src = fetchurl {
-        inherit (sources.${pname}.${system}) url hash;
+        inherit (artifacts.${pname}.${system}) url hash;
       };
     };
 
   mkFridaDevkit = mkFridaDevkitOrBinary ./frida-devkit.nix;
   mkFridaBinary = mkFridaDevkitOrBinary ./frida-binary.nix;
 
-  devkits = lib.genAttrs [ "frida-core" "frida-gum" "frida-gumjs" ] mkFridaDevkit;
+  devkits = lib.genAttrs [ "frida-core-devkit" "frida-gum-devkit" "frida-gumjs-devkit" ] mkFridaDevkit;
   binaries = lib.genAttrs [ "frida-server" "frida-portal" ] mkFridaBinary;
 in
 devkits // binaries // {
-  inherit metadata;
+  inherit manifest;
 
-  frida-python = python3Packages.callPackage ./frida-python.nix {
-    inherit version;
-    wheels = sources.frida-python;
+  frida-core = devkits.frida-core-devkit;
+  frida-gum = devkits.frida-gum-devkit;
+  frida-gumjs = devkits.frida-gumjs-devkit;
+
+  frida-python = callPackage ./frida-python.nix {
+    inherit python3Packages;
   };
 
-  frida-tools = python3Packages.callPackage ./frida-tools.nix {
-    inherit (sources.frida-tools) version hash;
-    frida = frida-python;
+  frida-tools = callPackage ./frida-tools.nix {
+    inherit python3Packages;
   };
 })

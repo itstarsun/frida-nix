@@ -5,15 +5,19 @@
 
   outputs = { self, nixpkgs }:
     let
-      eachSystem = nixpkgs.lib.genAttrs [
+      inherit (nixpkgs) lib;
+
+      systems = [
         "aarch64-darwin"
         "aarch64-linux"
         "x86_64-darwin"
         "x86_64-linux"
       ];
+
+      eachSystem = lib.genAttrs systems;
     in
     {
-      overlays.default = import ./overlay.nix { };
+      overlays.default = import ./overlay.nix;
 
       packages = eachSystem (system:
         let
@@ -24,36 +28,9 @@
             ];
           };
         in
-        with pkgs.frida; {
-          inherit
-            frida-core
-            frida-gum
-            frida-gumjs
-
-            frida-server
-            frida-portal
-
-            frida-tools
-            ;
-
-          frida-python = pkgs.python3Packages.frida;
-
-          default = frida-tools;
-        }
-      );
-
-      devShells = eachSystem (system:
-        let pkgs = nixpkgs.legacyPackages.${system}; in {
-          default = pkgs.mkShellNoCC {
-            packages = with pkgs; [
-              (python3.withPackages (p: with p; [
-                aiohttp
-                packaging
-              ]))
-              mypy
-              ruff
-            ];
-          };
+        lib.filterAttrs (lib.const lib.isDerivation) pkgs.fridaPackages // {
+          default = self.packages.${system}.frida-tools;
+          update = pkgs.writers.writePython3Bin "update" { } ./update.py;
         }
       );
     };

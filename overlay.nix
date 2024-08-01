@@ -1,5 +1,3 @@
-{ metadata ? builtins.fromJSON (builtins.readFile ./metadata.json) }:
-
 final: prev:
 
 let
@@ -14,20 +12,22 @@ let
 in
 
 {
-  frida = recurseIntoAttrs (callPackage ./. { inherit metadata; });
+  fridaPackages = recurseIntoAttrs (callPackage ./. { });
+
+  frida = lib.warn "frida is renamed to fridaPackages" final.fridaPackages;
 
   frida-tools = with final.python3Packages; toPythonApplication frida-tools;
 
   pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
     (pythonPackages: _:
       let
-        frida' = final.frida.override {
+        fridaPackages = final.fridaPackages.override {
           python3Packages = pythonPackages;
         };
       in
       {
-        frida = frida'.frida-python;
-        frida-tools = frida'.frida-tools;
+        frida = fridaPackages.frida-python;
+        frida-tools = fridaPackages.frida-tools;
       })
   ];
 }

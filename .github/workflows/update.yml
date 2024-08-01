@@ -1,0 +1,32 @@
+name: update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v13
+
+      - run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update flake.lock
+        run: nix flake update --commit-lock-file
+
+      - name: Update manifest
+        run: |
+          nix run .#update
+          git commit -am "manifest.json: Update"
+
+      - run: git push

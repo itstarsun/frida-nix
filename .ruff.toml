@@ -1,0 +1,18 @@
+line-length = 79
+target-version = "py312"
+
+[lint]
+preview = true
+select = [
+    # go/keep-sorted start
+    "ASYNC", # flake8-async
+    "B",     # flake8-bugbear
+    "E",     # pycodestyle
+    "F",     # Pyflakes
+    "FA",    # flake8-future-annotations
+    "I",     # isort
+    "SIM",   # flake8-simplify
+    "TCH",   # flake8-type-checking
+    "UP",    # pyupgrade
+    # go/keep-sorted end
+]
