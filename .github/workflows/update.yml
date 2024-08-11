@@ -24,9 +24,9 @@ jobs:
       - name: Update flake.lock
         run: nix flake update --commit-lock-file
 
-      - name: Update manifest
+      - name: Update manifest.json
         run: |
           nix run .#update
-          git commit -am "manifest.json: Update"
+          git diff-index --quiet HEAD || git commit -am "manifest.json: Update"
 
       - run: git push
