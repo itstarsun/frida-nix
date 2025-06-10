@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import argparse
 import json
 import logging
@@ -7,23 +5,21 @@ import re
 from asyncio import Future, TaskGroup, gather, run, to_thread
 from base64 import b64encode
 from binascii import unhexlify
+from collections.abc import Callable, Coroutine, Iterable, Iterator
 from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
-from functools import cached_property, wraps
+from functools import cached_property, partial, wraps
 from hashlib import file_digest
 from itertools import product
 from operator import itemgetter
 from pathlib import Path
-from typing import TYPE_CHECKING, ParamSpec, Self, TypedDict, TypeVar, cast
+from typing import (
+    Self,
+    TypedDict,
+    cast,
+)
 from urllib.request import Request, urlopen
-
-# TOOD(https://github.com/python/mypy/issues/15238): Use PEP 695.
-T = TypeVar("T")
-P = ParamSpec("P")
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Coroutine, Iterable, Iterator
 
 
 class NixSystem(StrEnum):
@@ -80,9 +76,9 @@ class GitHubArtifact(StrEnum):
 
 class Manifest(TypedDict):
     _version: str
-    _tools: Tools
-    wheels: dict[str, dict[str, DownloadedFile]]
-    artifacts: dict[str, dict[str, DownloadedFile]]
+    _tools: "Tools"
+    wheels: dict[str, dict[str, "DownloadedFile"]]
+    artifacts: dict[str, dict[str, "DownloadedFile"]]
 
 
 class Tools(TypedDict):
@@ -127,7 +123,7 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    manifest_path = cast(Path, args.manifest)
+    manifest_path = cast("Path", args.manifest)
 
     old_manifest = None
     if not args.force:
@@ -193,14 +189,14 @@ async def _update(
     )
 
 
-def _ready(value: T) -> Future[T]:
+def _ready[T](value: T) -> Future[T]:
     future = Future[T]()
     future.set_result(value)
     return future
 
 
 async def _download_frida_wheels(
-    project: PyPIProject,
+    project: "PyPIProject",
     version: str,
 ) -> dict[str, dict[str, DownloadedFile]]:
     return {
@@ -209,7 +205,7 @@ async def _download_frida_wheels(
 
 
 def _select_version(
-    project: PyPIProject,
+    project: "PyPIProject",
     wanted_version: str,
 ) -> str:
     versions = project["versions"]
@@ -219,7 +215,7 @@ def _select_version(
         # See https://peps.python.org/pep-0700/#versions.
         return max(versions, key=_parse_version)
     elif wanted_version not in versions:
-        raise ValueError(f"{project["name"]}@{wanted_version} is not found")
+        raise ValueError(f"{project['name']}@{wanted_version} is not found")
     else:
         return wanted_version
 
@@ -264,15 +260,15 @@ async def _download_artifact_for(
 
 
 async def _download_wheel_files_for(
-    project: PyPIProject,
+    project: "PyPIProject",
     version: str,
 ) -> dict[str, DownloadedFile]:
-    wheel_files = list(
+    wheel_files = [
         (_ParsedWheelFilename.parse(wheel_file["filename"]), wheel_file)
         for wheel_file in pypi_wheel_files_for(project, version)
-    )
+    ]
     if len(wheel_files) == 0:
-        raise ValueError(f"{project["name"]}@{version} has no wheel files")
+        raise ValueError(f"{project['name']}@{version} has no wheel files")
 
     # Sort wheel files by parsed filenames, which takes platform versions
     # into account.
@@ -288,7 +284,7 @@ async def _download_wheel_files_for(
 
 
 async def _download_wheel_file_for(
-    files: Iterable[tuple[_ParsedWheelFilename, PyPIFile]],
+    files: Iterable[tuple["_ParsedWheelFilename", "PyPIFile"]],
     system: NixSystem,
 ) -> DownloadedFile:
     for filename, file in files:
@@ -356,12 +352,10 @@ class _ParsedWheelFilename:
         return self._cmp_key < other._cmp_key
 
 
-def asyncify(func: Callable[P, T]) -> Callable[P, Coroutine[None, None, T]]:
-    @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Coroutine[None, None, T]:
-        return to_thread(func, *args, **kwargs)
-
-    return wrapper
+def asyncify[**P, T](
+    func: Callable[P, T],
+) -> Callable[P, Coroutine[None, None, T]]:
+    return wraps(func)(partial(to_thread, func))
 
 
 """
@@ -369,10 +363,10 @@ Utility functions for downloading files and returning their SRI hashes.
 """
 
 
-async def download_sdist_file_for(project: PyPIProject, version: str) -> str:
+async def download_sdist_file_for(project: "PyPIProject", version: str) -> str:
     (sdist_file, *rest) = pypi_sdist_files_for(project, version)
     if len(rest) != 0:
-        logging.warn(
+        logging.warning(
             "found multiple sdist files for %s@%s",
             project["name"],
             version,
@@ -380,7 +374,7 @@ async def download_sdist_file_for(project: PyPIProject, version: str) -> str:
     return await download_pypi_file(sdist_file)
 
 
-async def download_pypi_file(file: PyPIFile) -> str:
+async def download_pypi_file(file: "PyPIFile") -> str:
     if (hexdigest := file["hashes"].get("sha256")) is not None:
         return _sha256_digest_to_sri(unhexlify(hexdigest))
     # This is unlikely to happen, but just in case.
@@ -410,7 +404,7 @@ for details.
 
 class PyPIProject(TypedDict):
     name: str
-    files: list[PyPIFile]
+    files: list["PyPIFile"]
     versions: list[str]  # api-version >= 1.1
 
 
@@ -426,14 +420,14 @@ def pypi_get_project(name: str) -> PyPIProject:
     req.add_header("Accept", "application/vnd.pypi.simple.v1+json")
     with urlopen(req) as resp:
         data = json.load(resp)
-        assert (
-            data["meta"]["api-version"] != "1.0"
-        ), "API version 1.0 is not supported"
-        return cast(PyPIProject, data)
+        assert data["meta"]["api-version"] != "1.0", (
+            "API version 1.0 is not supported"
+        )
+        return cast("PyPIProject", data)
 
 
 def pypi_files_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
-    prefix = f"{project["name"]}-{version}"
+    prefix = f"{project['name']}-{version}"
     for file in project["files"]:
         if file["filename"].startswith(prefix):
             yield file

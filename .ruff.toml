@@ -3,16 +3,17 @@ target-version = "py312"
 
 [lint]
 preview = true
-select = [
+extend-select = [
     # go/keep-sorted start
     "ASYNC", # flake8-async
     "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
     "E",     # pycodestyle
     "F",     # Pyflakes
     "FA",    # flake8-future-annotations
     "I",     # isort
     "SIM",   # flake8-simplify
-    "TCH",   # flake8-type-checking
+    "TC",    # flake8-type-checking
     "UP",    # pyupgrade
     # go/keep-sorted end
 ]
