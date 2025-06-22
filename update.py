@@ -21,6 +21,13 @@ from typing import (
 )
 from urllib.request import Request, urlopen
 
+from packaging.utils import (
+    canonicalize_name,
+    parse_sdist_filename,
+    parse_wheel_filename,
+)
+from packaging.version import Version
+
 
 class NixSystem(StrEnum):
     AARCH64_DARWIN = "aarch64-darwin"
@@ -426,10 +433,24 @@ def pypi_get_project(name: str) -> PyPIProject:
         return cast("PyPIProject", data)
 
 
-def pypi_files_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
-    prefix = f"{project['name']}-{version}"
+def pypi_files_for(
+    project: PyPIProject,
+    version: str | Version,
+) -> Iterator[PyPIFile]:
+    name = canonicalize_name(project["name"])
+    if isinstance(version, str):
+        version = Version(version)
     for file in project["files"]:
-        if file["filename"].startswith(prefix):
+        filename = file["filename"]
+        if filename.endswith(".whl"):
+            (parsed_name, parsed_version, _, _) = parse_wheel_filename(
+                filename
+            )
+        elif filename.endswith((".tar.gz", ".zip")):
+            (parsed_name, parsed_version) = parse_sdist_filename(filename)
+        else:
+            continue
+        if parsed_name == name and parsed_version == version:
             yield file
 
 

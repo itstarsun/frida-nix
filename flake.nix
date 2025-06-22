@@ -30,7 +30,10 @@
         in
         lib.filterAttrs (lib.const lib.isDerivation) pkgs.fridaPackages // {
           default = self.packages.${system}.frida-tools;
-          update = pkgs.writers.writePython3Bin "update" { } ./update.py;
+          update = pkgs.writers.writePython3Bin "update"
+            {
+              libraries = [ pkgs.python3Packages.packaging ];
+            } ./update.py;
         }
       );
     };
