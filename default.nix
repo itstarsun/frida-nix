@@ -6,13 +6,13 @@
 , manifest ? lib.importJSON ./manifest.json
 }:
 
-lib.makeScope newScope (self: with self;
+lib.makeScope newScope (self:
 let
-  version = manifest._version;
-  inherit (manifest) artifacts;
+  version = self.manifest._version;
+  inherit (self.manifest) artifacts;
 
   mkFridaDevkitOrBinary = path: pname:
-    callPackage path {
+    self.callPackage path {
       inherit pname version;
       src = fetchurl {
         inherit (artifacts.${pname}.${system}) url hash;
@@ -28,15 +28,15 @@ in
 devkits // binaries // {
   inherit manifest;
 
-  frida-core = devkits.frida-core-devkit;
-  frida-gum = devkits.frida-gum-devkit;
-  frida-gumjs = devkits.frida-gumjs-devkit;
+  frida-core = self.frida-core-devkit;
+  frida-gum = self.frida-gum-devkit;
+  frida-gumjs = self.frida-gumjs-devkit;
 
-  frida-python = callPackage ./frida-python.nix {
+  frida-python = self.callPackage ./frida-python.nix {
     inherit python3Packages;
   };
 
-  frida-tools = callPackage ./frida-tools.nix {
+  frida-tools = self.callPackage ./frida-tools.nix {
     inherit python3Packages;
   };
 })
