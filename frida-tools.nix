@@ -1,20 +1,20 @@
 { manifest
 , lib
-, fetchPypi
+, fetchurl
 , python3Packages
 }:
 
 let
   version = manifest._tools._version;
-  inherit (manifest._tools) hash;
+  inherit (manifest._tools) url hash;
 in
 
-python3Packages.buildPythonPackage rec {
+python3Packages.buildPythonPackage {
   pname = "frida-tools";
   inherit version;
 
-  src = fetchPypi {
-    inherit pname version hash;
+  src = fetchurl {
+    inherit url hash;
   };
 
   dependencies = with python3Packages; [

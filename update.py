@@ -22,7 +22,6 @@ from typing import (
 from urllib.request import Request, urlopen
 
 from packaging.utils import (
-    canonicalize_name,
     parse_sdist_filename,
     parse_wheel_filename,
 )
@@ -90,6 +89,7 @@ class Manifest(TypedDict):
 
 class Tools(TypedDict):
     _version: str
+    url: str
     hash: str
 
 
@@ -157,7 +157,7 @@ async def _update(
     version = _select_version(frida, version)
     tools_version = _select_version(frida_tools, tools_version)
 
-    tools_sdist_hash = None
+    tools_sdist_file = None
     wheels = None
     artifacts = None
 
@@ -167,17 +167,22 @@ async def _update(
                 wheels = _ready(old_manifest["wheels"])
                 artifacts = _ready(old_manifest["artifacts"])
             if old_manifest["_tools"]["_version"] == tools_version:
-                tools_sdist_hash = _ready(old_manifest["_tools"]["hash"])
+                tools_sdist_file = _ready(
+                    (
+                        old_manifest["_tools"]["url"],
+                        old_manifest["_tools"]["hash"],
+                    )
+                )
             if (
                 artifacts is not None
                 and wheels is not None
-                and tools_sdist_hash is not None
+                and tools_sdist_file is not None
             ):
                 return old_manifest
 
     async with TaskGroup() as tg:
-        if tools_sdist_hash is None:
-            tools_sdist_hash = tg.create_task(
+        if tools_sdist_file is None:
+            tools_sdist_file = tg.create_task(
                 download_sdist_file_for(frida_tools, tools_version)
             )
         if wheels is None:
@@ -185,11 +190,14 @@ async def _update(
         if artifacts is None:
             artifacts = tg.create_task(_download_artifacts(version))
 
+    (tools_sdist_url, tools_sdist_hash) = tools_sdist_file.result()
+
     return Manifest(
         _version=version,
         _tools=Tools(
             _version=tools_version,
-            hash=tools_sdist_hash.result(),
+            url=tools_sdist_url,
+            hash=tools_sdist_hash,
         ),
         artifacts=artifacts.result(),
         wheels=wheels.result(),
@@ -370,7 +378,9 @@ Utility functions for downloading files and returning their SRI hashes.
 """
 
 
-async def download_sdist_file_for(project: "PyPIProject", version: str) -> str:
+async def download_sdist_file_for(
+    project: "PyPIProject", version: str
+) -> tuple[str, str]:
     (sdist_file, *rest) = pypi_sdist_files_for(project, version)
     if len(rest) != 0:
         logging.warning(
@@ -378,7 +388,7 @@ async def download_sdist_file_for(project: "PyPIProject", version: str) -> str:
             project["name"],
             version,
         )
-    return await download_pypi_file(sdist_file)
+    return sdist_file["url"], await download_pypi_file(sdist_file)
 
 
 async def download_pypi_file(file: "PyPIFile") -> str:
@@ -437,20 +447,17 @@ def pypi_files_for(
     project: PyPIProject,
     version: str | Version,
 ) -> Iterator[PyPIFile]:
-    name = canonicalize_name(project["name"])
     if isinstance(version, str):
         version = Version(version)
     for file in project["files"]:
         filename = file["filename"]
         if filename.endswith(".whl"):
-            (parsed_name, parsed_version, _, _) = parse_wheel_filename(
-                filename
-            )
+            (_, parsed_version, _, _) = parse_wheel_filename(filename)
         elif filename.endswith((".tar.gz", ".zip")):
-            (parsed_name, parsed_version) = parse_sdist_filename(filename)
+            (_, parsed_version) = parse_sdist_filename(filename)
         else:
             continue
-        if parsed_name == name and parsed_version == version:
+        if parsed_version == version:
             yield file
 
 

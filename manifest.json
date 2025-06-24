@@ -1,7 +1,8 @@
 {
   "_tools": {
     "_version": "14.3.0",
-    "hash": "sha256-eazmr+NRftikijspwZefE9VNqtuxfSl4+SFa1ZE6soY="
+    "hash": "sha256-eazmr+NRftikijspwZefE9VNqtuxfSl4+SFa1ZE6soY=",
+    "url": "https://files.pythonhosted.org/packages/d5/18/ea8aaff5a16f93e068e6de65604329bbc101fa6f07d0f367e84fdf96b918/frida_tools-14.3.0.tar.gz"
   },
   "_version": "17.2.4",
   "artifacts": {
