@@ -1,8 +1,9 @@
-{ manifest
-, lib
-, system
-, fetchurl
-, python3Packages
+{
+  manifest,
+  lib,
+  system,
+  fetchurl,
+  python3Packages,
 }:
 
 let
@@ -20,9 +21,11 @@ python3Packages.buildPythonPackage {
     inherit (wheel) url hash;
   };
 
-  dependencies = with python3Packages; lib.optional (!python.pythonAtLeast "3.11") [
-    typing-extensions
-  ];
+  dependencies =
+    with python3Packages;
+    lib.optional (!python.pythonAtLeast "3.11") [
+      typing-extensions
+    ];
 
   pythonImportsCheck = [
     "frida"

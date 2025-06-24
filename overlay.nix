@@ -19,7 +19,8 @@ in
   frida-tools = with final.python3Packages; toPythonApplication frida-tools;
 
   pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-    (pythonPackages: _:
+    (
+      pythonPackages: _:
       let
         fridaPackages = final.fridaPackages.override {
           python3Packages = pythonPackages;
@@ -28,6 +29,7 @@ in
       {
         frida = fridaPackages.frida-python;
         frida-tools = fridaPackages.frida-tools;
-      })
+      }
+    )
   ];
 }

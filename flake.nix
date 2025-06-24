@@ -3,7 +3,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs =
+    { self, nixpkgs }:
+
     let
       inherit (nixpkgs) lib;
 
@@ -19,7 +21,8 @@
     {
       overlays.default = import ./overlay.nix;
 
-      packages = eachSystem (system:
+      packages = eachSystem (
+        system:
         let
           pkgs = import nixpkgs {
             inherit system;
@@ -28,12 +31,12 @@
             ];
           };
         in
-        lib.filterAttrs (lib.const lib.isDerivation) pkgs.fridaPackages // {
+        lib.filterAttrs (lib.const lib.isDerivation) pkgs.fridaPackages
+        // {
           default = self.packages.${system}.frida-tools;
-          update = pkgs.writers.writePython3Bin "update"
-            {
-              libraries = [ pkgs.python3Packages.packaging ];
-            } ./update.py;
+          update = pkgs.writers.writePython3Bin "update" {
+            libraries = [ pkgs.python3Packages.packaging ];
+          } ./update.py;
         }
       );
     };

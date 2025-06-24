@@ -1,7 +1,8 @@
-{ manifest
-, lib
-, fetchurl
-, python3Packages
+{
+  manifest,
+  lib,
+  fetchurl,
+  python3Packages,
 }:
 
 let
