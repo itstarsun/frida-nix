@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
   };
 
   outputs =
@@ -23,6 +23,7 @@
 
       packages = eachSystem (
         system:
+
         let
           pkgs = import nixpkgs {
             inherit system;
@@ -31,9 +32,11 @@
             ];
           };
         in
+
         lib.filterAttrs (lib.const lib.isDerivation) pkgs.fridaPackages
         // {
-          default = self.packages.${system}.frida-tools;
+          default = pkgs.frida-tools;
+
           update = pkgs.writers.writePython3Bin "update" {
             libraries = [ pkgs.python3Packages.packaging ];
           } ./update.py;
