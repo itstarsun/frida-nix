@@ -14,6 +14,8 @@ python3Packages.buildPythonPackage {
   pname = "frida-tools";
   inherit version;
 
+  format = "setuptools";
+
   src = fetchurl {
     inherit url hash;
   };
