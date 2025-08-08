@@ -25,6 +25,7 @@ python3Packages.buildPythonPackage {
     frida
     prompt-toolkit
     pygments
+    websockets
   ];
 
   pythonImportsCheck = [
