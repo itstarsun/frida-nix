@@ -20,6 +20,10 @@ python3Packages.buildPythonPackage {
     inherit url hash;
   };
 
+  patches = [
+    ./frida-tools-websockets.patch
+  ];
+
   build-system = [
     python3Packages.setuptools
   ];
