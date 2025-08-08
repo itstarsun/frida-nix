@@ -14,11 +14,15 @@ python3Packages.buildPythonPackage {
   pname = "frida-tools";
   inherit version;
 
-  format = "setuptools";
+  pyproject = true;
 
   src = fetchurl {
     inherit url hash;
   };
+
+  build-system = [
+    python3Packages.setuptools
+  ];
 
   dependencies = with python3Packages; [
     colorama
