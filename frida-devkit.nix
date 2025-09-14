@@ -23,6 +23,6 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers (SDK)";
     homepage = "https://www.frida.re/";
-    license = licenses.wxWindows;
+    license = licenses.wxWindowsException31;
   };
 }

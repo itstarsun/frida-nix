@@ -38,6 +38,6 @@ python3Packages.buildPythonPackage {
   meta = with lib; {
     description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers (Python bindings)";
     homepage = "https://www.frida.re/";
-    license = licenses.wxWindows;
+    license = licenses.wxWindowsException31;
   };
 }
