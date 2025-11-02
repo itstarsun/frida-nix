@@ -4,116 +4,116 @@
     "hash": "sha256-Bmb6H49YiNcESwjveF+kWBPtkqFPkOiY6G1OnH3eAwY=",
     "url": "https://files.pythonhosted.org/packages/74/24/a6622bd38be67f47327de2789ce1cf0923e1c276279569adae563bbe8783/frida_tools-14.4.6.tar.gz"
   },
-  "_version": "17.4.1",
+  "_version": "17.4.4",
   "artifacts": {
     "frida-core-devkit": {
       "aarch64-darwin": {
-        "hash": "sha256-shjBqz6tBx6AjjzAtI0L8im2cBSjQXS1TIvsaajQ1jM=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-core-devkit-17.4.1-macos-arm64.tar.xz"
+        "hash": "sha256-4q1xi06gyU5ts+Dz5dPC/dEg0eUGmDMEbKBaYAGfDaw=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-core-devkit-17.4.4-macos-arm64.tar.xz"
       },
       "aarch64-linux": {
-        "hash": "sha256-PDTNKzwYuJgZLDCp804cSySllobvvmIm6lmbCNeKLbY=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-core-devkit-17.4.1-linux-arm64.tar.xz"
+        "hash": "sha256-8VN0ADQKeFufSbpl95AIyEnC4+x833RyVvOtwRq8gHY=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-core-devkit-17.4.4-linux-arm64.tar.xz"
       },
       "x86_64-darwin": {
-        "hash": "sha256-j7Z1Ol6don4FGigzKg6cYUM1zDfer0A42IwFkMvUMeI=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-core-devkit-17.4.1-macos-x86_64.tar.xz"
+        "hash": "sha256-d8TsZ33IPy88PSlAKBv/LP7L2AfSR00InDDDmEX5vU8=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-core-devkit-17.4.4-macos-x86_64.tar.xz"
       },
       "x86_64-linux": {
-        "hash": "sha256-ZK2p9244r75wuPqzTKCYa2kXcIB28wkcp44Ven+BdWo=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-core-devkit-17.4.1-linux-x86_64.tar.xz"
+        "hash": "sha256-qQcWPrkBwYLaXTDkOl3sITBGTSChAuVA1yQ90k+x5/A=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-core-devkit-17.4.4-linux-x86_64.tar.xz"
       }
     },
     "frida-gum-devkit": {
       "aarch64-darwin": {
-        "hash": "sha256-3GkXj/agjzLQLcThCEjC9c9ckuZmRz37vbTCrIwv7+w=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gum-devkit-17.4.1-macos-arm64.tar.xz"
+        "hash": "sha256-IknLx6r1qVkGC2YPfskqmvDIDlLBFPltCj+MEL5ZpQQ=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gum-devkit-17.4.4-macos-arm64.tar.xz"
       },
       "aarch64-linux": {
-        "hash": "sha256-J/uvYvU+xGhZPVflSsdk1fzKFLYUjY+Pvw6vCiQrsso=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gum-devkit-17.4.1-linux-arm64.tar.xz"
+        "hash": "sha256-K+8CxYr1B3dvrjRKa26qWX5hy0HCuYELD+i+MFI4jU0=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gum-devkit-17.4.4-linux-arm64.tar.xz"
       },
       "x86_64-darwin": {
-        "hash": "sha256-DBNNll1rNmAgZXpWrSV852Y5F0zwDmLfYSHND4t/euQ=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gum-devkit-17.4.1-macos-x86_64.tar.xz"
+        "hash": "sha256-In9vS39zIpeQW2gpvGhNHwaM+I3DoDHw3zp9GSu0Yuc=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gum-devkit-17.4.4-macos-x86_64.tar.xz"
       },
       "x86_64-linux": {
-        "hash": "sha256-GBfY+bCXJM4sGONV/vthDn19OopbxUdPcDJwhIHBCE0=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gum-devkit-17.4.1-linux-x86_64.tar.xz"
+        "hash": "sha256-gj3M16koT9wMbPatP+ueqRAY1bVCmFnNJIBK8sCHXB4=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gum-devkit-17.4.4-linux-x86_64.tar.xz"
       }
     },
     "frida-gumjs-devkit": {
       "aarch64-darwin": {
-        "hash": "sha256-x17P9lkucbIXUPZE4Kcu4B+0uQnb4PWccvOsDoU/TUI=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gumjs-devkit-17.4.1-macos-arm64.tar.xz"
+        "hash": "sha256-jyurfjyRHI1jSFma5VNiJYBEyXGWfF/XHE8PmlOA6cE=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gumjs-devkit-17.4.4-macos-arm64.tar.xz"
       },
       "aarch64-linux": {
-        "hash": "sha256-VyM+OLlroo66mQjge11SyVSuKFSvDgmcp0JGISyqM/A=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gumjs-devkit-17.4.1-linux-arm64.tar.xz"
+        "hash": "sha256-H1oZW3oHAaiIacly+0i1sHcA1b4QzQ1NggxTrXL8wg8=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gumjs-devkit-17.4.4-linux-arm64.tar.xz"
       },
       "x86_64-darwin": {
-        "hash": "sha256-6/3pmJbMMeZJkF1FIV3EPU73JltJeoVJhN7ZTOp4mLA=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gumjs-devkit-17.4.1-macos-x86_64.tar.xz"
+        "hash": "sha256-o5ht2Cy8n1wnX1wJzzIXSinG4F+kt4YYpzwOWIviPnQ=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gumjs-devkit-17.4.4-macos-x86_64.tar.xz"
       },
       "x86_64-linux": {
-        "hash": "sha256-+MCWYh71pP77i1BgDC66I/ZRr4d9kyh/tyN/2409GjU=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-gumjs-devkit-17.4.1-linux-x86_64.tar.xz"
+        "hash": "sha256-6zhEIrL0WROSiVZspI73vdrgTj3fHJYlooBSy6bST8M=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-gumjs-devkit-17.4.4-linux-x86_64.tar.xz"
       }
     },
     "frida-portal": {
       "aarch64-darwin": {
-        "hash": "sha256-TPNiPSxyCTTBPv/jgu5Yg6laHKhs94l1worwDNExENU=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-portal-17.4.1-macos-arm64.xz"
+        "hash": "sha256-txTJwG4c5ISjn2mvKTmfdCCuHXtQ2Iom7hrh8XJjqTc=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-portal-17.4.4-macos-arm64.xz"
       },
       "aarch64-linux": {
-        "hash": "sha256-2K/YOGx61mTR4DKKclowzP1au7/2tykhTpKelEhRlT4=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-portal-17.4.1-linux-arm64.xz"
+        "hash": "sha256-cQ+zc1JZR8fsJHcSHaOJoGdH/E6ne3t+yPzJtfmK0Yk=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-portal-17.4.4-linux-arm64.xz"
       },
       "x86_64-darwin": {
-        "hash": "sha256-yKmdV9P3/W25vh8rkLoa3iu7VpOoqF69K2BReOnsGXY=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-portal-17.4.1-macos-x86_64.xz"
+        "hash": "sha256-LV1EqRTerg/WcsrRZqxWicS9fLKG1i68F3WqLwoM7q4=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-portal-17.4.4-macos-x86_64.xz"
       },
       "x86_64-linux": {
-        "hash": "sha256-RG0UQw4IlEnOqclkRWS0vM25IqgQ5YT1yWNNlpLSfgY=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-portal-17.4.1-linux-x86_64.xz"
+        "hash": "sha256-w3/cwz7bw+lReJ2HMCDD8ibdwfM2hqXBvG8vxpBp5K0=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-portal-17.4.4-linux-x86_64.xz"
       }
     },
     "frida-server": {
       "aarch64-darwin": {
-        "hash": "sha256-t2YyTEWgwGD4wP27JVBX/DEMtRF67WEbLDn8ECi0WE8=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-server-17.4.1-macos-arm64.xz"
+        "hash": "sha256-au+be9SxO3A5hHRMYQGXzhxO+QnR0OtGhXtzQ4IXaQg=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-server-17.4.4-macos-arm64.xz"
       },
       "aarch64-linux": {
-        "hash": "sha256-oNkM6udgXrKC3VbGkOU90fYVBHyEfaeqX++ElfIVAxo=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-server-17.4.1-linux-arm64.xz"
+        "hash": "sha256-Ii3lU0BWOOQvYLNtg8OvzgEAs55aN/9ji8rCeuas32I=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-server-17.4.4-linux-arm64.xz"
       },
       "x86_64-darwin": {
-        "hash": "sha256-ghzYz6knaFbJot7W8sJiS1pl26jdk7Rw7GyV0TJRiLA=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-server-17.4.1-macos-x86_64.xz"
+        "hash": "sha256-emFw771IULDCzang+tn62mlimdIJoIoGvVsRUPJCCu0=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-server-17.4.4-macos-x86_64.xz"
       },
       "x86_64-linux": {
-        "hash": "sha256-KTID/9f4N2aoMUrJt9ogBrPvrt1XK4wep54iumGZ400=",
-        "url": "https://github.com/frida/frida/releases/download/17.4.1/frida-server-17.4.1-linux-x86_64.xz"
+        "hash": "sha256-84inTIOifUSRvY8cxUzs0WTZJA57mLmj4vzvDYy3r48=",
+        "url": "https://github.com/frida/frida/releases/download/17.4.4/frida-server-17.4.4-linux-x86_64.xz"
       }
     }
   },
   "wheels": {
     "frida": {
       "aarch64-darwin": {
-        "hash": "sha256-aHu1JpnKDMrlrjOve6UnLDK1hYblJZF9bKlbxPRKeio=",
-        "url": "https://files.pythonhosted.org/packages/69/92/cb868e26950c08944869ba3659f0c71e915d6a7dd57134718e7fc2cacabb/frida-17.4.1-cp37-abi3-macosx_11_0_arm64.whl"
+        "hash": "sha256-YPCNmDjN+NoAWmmh1nhn2LR4W77EXkkVksD0R8bahZ0=",
+        "url": "https://files.pythonhosted.org/packages/64/ed/912239b30f521c7108992b37866a41fc7ad0febc3aacacbbfbf896c9637e/frida-17.4.4-cp37-abi3-macosx_11_0_arm64.whl"
       },
       "aarch64-linux": {
-        "hash": "sha256-3e4IBkRCNlELLn/ZUhJBcyiBfSuR8bDkLOAiWVQMRkg=",
-        "url": "https://files.pythonhosted.org/packages/1c/1c/3d8ae332c6cc0eb8c2a28b1e6e4537de380bf666a21881516d92c7a3db77/frida-17.4.1-cp37-abi3-manylinux2014_aarch64.whl"
+        "hash": "sha256-ebjBPx/V0TpJqTsvzqoit2r9B3TFUIk48n1kNv1XmAs=",
+        "url": "https://files.pythonhosted.org/packages/97/77/137638c492fd868025ce983e4287dfadf6f4c573ca08623cde30756ab7c9/frida-17.4.4-cp37-abi3-manylinux2014_aarch64.whl"
       },
       "x86_64-darwin": {
-        "hash": "sha256-o8hVponku8CY2p8/ZkI22rUPCHU5bGT7S4gqLAr9h04=",
-        "url": "https://files.pythonhosted.org/packages/1d/9e/f96e20fea7427e164602f97ca26972b545b72c3de94fb3d3f80f0b4f1b17/frida-17.4.1-cp37-abi3-macosx_10_13_x86_64.whl"
+        "hash": "sha256-acB2v4tWgkupj20qjROCMitiogCTW1A9uRzv0uBr/h0=",
+        "url": "https://files.pythonhosted.org/packages/79/e9/5186302ab9de7403685267a5eb1e8d1bb4cacbef324501170b5caa6843a2/frida-17.4.4-cp37-abi3-macosx_10_13_x86_64.whl"
       },
       "x86_64-linux": {
-        "hash": "sha256-bg4S1mHU9RODGx8lDvCI3o+CpBqaljZQqzLVM9ffiMQ=",
-        "url": "https://files.pythonhosted.org/packages/1c/84/dc8e5eabe169032966615fc7769cf15758ddd706b0721e963c6aaeaa39f0/frida-17.4.1-cp37-abi3-manylinux1_x86_64.whl"
+        "hash": "sha256-5kpj9Oaug23rmoBZF8Ev94qISI0TlIV3hEdUb+CjhCw=",
+        "url": "https://files.pythonhosted.org/packages/b1/c0/b7f3a45ef9e4a05b4318430b0f119c7df81469ac2794ec2228868e47e372/frida-17.4.4-cp37-abi3-manylinux1_x86_64.whl"
       }
     }
   }
