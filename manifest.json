@@ -1,8 +1,8 @@
 {
   "_tools": {
-    "_version": "14.8.0",
-    "hash": "sha256-eoq9nuva2BC/nudFVPYaq8sHNYPuHXmLf1U61RB6+TY=",
-    "url": "https://files.pythonhosted.org/packages/66/ce/ac1f5ee6da7b941f273c5998dc33b773a79e93db271db80bc40051727b3d/frida_tools-14.8.0.tar.gz"
+    "_version": "14.8.1",
+    "hash": "sha256-8jZU9iseaVgcv8vEKEYmJpvSGH0oubUDeTUXVIWgqCE=",
+    "url": "https://files.pythonhosted.org/packages/73/81/d3ffd045dc30486383d678d980845fb173d2eda8c8e220e80b3207a99266/frida_tools-14.8.1.tar.gz"
   },
   "_version": "17.9.1",
   "artifacts": {
