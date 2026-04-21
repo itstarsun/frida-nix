@@ -19,9 +19,13 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers";
     homepage = "https://www.frida.re/";
-    license = licenses.wxWindowsException31;
+    license = with lib.licenses; [
+      lgpl2Plus
+      wxWindowsException31
+    ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
 }

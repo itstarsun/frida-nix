@@ -40,10 +40,14 @@ python3Packages.buildPythonPackage {
     "frida_tools"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers (CLI tools)";
     homepage = "https://www.frida.re/";
-    license = licenses.wxWindowsException31;
+    license = with lib.licenses; [
+      lgpl2Plus
+      wxWindowsException31
+    ];
     mainProgram = "frida";
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
   };
 }
