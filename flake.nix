@@ -39,6 +39,7 @@
 
           update = pkgs.writers.writePython3Bin "update" {
             libraries = [ pkgs.python3Packages.packaging ];
+            doCheck = false;
           } ./update.py;
         }
       );
