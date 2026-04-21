@@ -21,10 +21,6 @@ python3Packages.buildPythonPackage {
     inherit (wheel) url hash;
   };
 
-  nativeBuildInputs = [
-    python3Packages.pythonRuntimeDepsCheckHook
-  ];
-
   dependencies =
     with python3Packages;
     lib.optional (!python.pythonAtLeast "3.11") [
