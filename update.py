@@ -27,6 +27,8 @@ from packaging.utils import (
 )
 from packaging.version import Version
 
+logger = logging.getLogger(__name__)
+
 
 class NixSystem(StrEnum):
     AARCH64_DARWIN = "aarch64-darwin"
@@ -77,7 +79,7 @@ class GitHubArtifact(StrEnum):
     def download_url_for(self, version: str, system: NixSystem) -> str:
         (arch, os) = system.github_arch_os
         filename = f"{self.value}-{version}-{os}-{arch}.{self.extension}"
-        return f"https://github.com/frida/frida/releases/download/{version}/{filename}"  # noqa: E501
+        return f"https://github.com/frida/frida/releases/download/{version}/{filename}"
 
 
 class Manifest(TypedDict):
@@ -383,7 +385,7 @@ async def download_sdist_file_for(
 ) -> tuple[str, str]:
     (sdist_file, *rest) = pypi_sdist_files_for(project, version)
     if len(rest) != 0:
-        logging.warning(
+        logger.warning(
             "found multiple sdist files for %s@%s",
             project["name"],
             version,
@@ -400,7 +402,7 @@ async def download_pypi_file(file: "PyPIFile") -> str:
 
 @asyncify
 def download_file(url: str) -> str:
-    logging.info("downloading %s", url)
+    logger.info("downloading %s", url)
     with urlopen(url) as f:
         digest = file_digest(f, "sha256").digest()
         return _sha256_digest_to_sri(digest)
@@ -416,7 +418,7 @@ the client assumes that the server supports API version 1.1 or later.
 
 See https://packaging.python.org/en/latest/specifications/simple-repository-api/
 for details.
-"""  # noqa: E501
+"""
 
 
 class PyPIProject(TypedDict):
