@@ -1,11 +1,15 @@
 {
   lib,
-  system,
+  stdenv,
   newScope,
   fetchurl,
   python3Packages,
   manifest ? lib.importJSON ./manifest.json,
 }:
+
+let
+  inherit (stdenv.hostPlatform) system;
+in
 
 lib.makeScope newScope (
   self:

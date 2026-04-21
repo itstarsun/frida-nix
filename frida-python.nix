@@ -1,14 +1,14 @@
 {
   manifest,
   lib,
-  system,
+  stdenv,
   fetchurl,
   python3Packages,
 }:
 
 let
   version = manifest._version;
-  wheel = manifest.wheels.frida.${system};
+  wheel = manifest.wheels.frida.${stdenv.hostPlatform.system};
 in
 
 python3Packages.buildPythonPackage {
