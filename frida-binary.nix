@@ -1,12 +1,12 @@
 {
   lib,
-  stdenv,
+  stdenvNoCC,
   pname,
   version,
   src,
 }:
 
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation {
   inherit pname version src;
 
   dontUnpack = true;
