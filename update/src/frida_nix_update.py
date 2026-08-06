@@ -292,10 +292,7 @@ async def _download_wheel_files_for(
     wheel_files.sort(key=itemgetter(0))
 
     downloaded_files = await gather(
-        *(
-            _download_wheel_file_for(wheel_files, system)
-            for system in NixSystem
-        )
+        *(_download_wheel_file_for(wheel_files, system) for system in NixSystem)
     )
     return dict(zip(NixSystem, downloaded_files, strict=True))
 
@@ -439,9 +436,7 @@ def pypi_get_project(name: str) -> PyPIProject:
     req.add_header("Accept", "application/vnd.pypi.simple.v1+json")
     with urlopen(req) as resp:
         data = json.load(resp)
-        assert data["meta"]["api-version"] != "1.0", (
-            "API version 1.0 is not supported"
-        )
+        assert data["meta"]["api-version"] != "1.0", "API version 1.0 is not supported"
         return cast("PyPIProject", data)
 
 
@@ -463,17 +458,13 @@ def pypi_files_for(
             yield file
 
 
-def pypi_sdist_files_for(
-    project: PyPIProject, version: str
-) -> Iterator[PyPIFile]:
+def pypi_sdist_files_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
     for file in pypi_files_for(project, version):
         if file["filename"].endswith((".tar.gz", ".zip")):
             yield file
 
 
-def pypi_wheel_files_for(
-    project: PyPIProject, version: str
-) -> Iterator[PyPIFile]:
+def pypi_wheel_files_for(project: PyPIProject, version: str) -> Iterator[PyPIFile]:
     for file in pypi_files_for(project, version):
         if file["filename"].endswith(".whl"):
             yield file
