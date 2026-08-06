@@ -51,6 +51,7 @@ lib.makeScope newScope (
 
     frida-tools = self.callPackage ./frida-tools.nix {
       inherit python3Packages;
+      frida = self.frida-python;
     };
   }
 )

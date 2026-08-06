@@ -3,6 +3,7 @@
   lib,
   fetchurl,
   python3Packages,
+  frida,
 }:
 
 let
