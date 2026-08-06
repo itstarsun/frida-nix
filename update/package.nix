@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   setuptools,
+  httpx,
   packaging,
 }:
 
@@ -20,7 +21,10 @@ buildPythonPackage {
 
   build-system = [ setuptools ];
 
-  dependencies = [ packaging ];
+  dependencies = [
+    httpx
+    packaging
+  ];
 
   pythonImportsCheck = [ "frida_nix_update" ];
 

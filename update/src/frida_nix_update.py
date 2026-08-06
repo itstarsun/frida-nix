@@ -1,16 +1,16 @@
 import argparse
+import hashlib
 import json
 import logging
 import re
-from asyncio import Future, TaskGroup, gather, run, to_thread
+from asyncio import Future, TaskGroup, gather, run
 from base64 import b64encode
 from binascii import unhexlify
-from collections.abc import Callable, Coroutine, Iterable, Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
-from functools import cached_property, partial, wraps
-from hashlib import file_digest
+from functools import cached_property
 from itertools import product
 from operator import itemgetter
 from pathlib import Path
@@ -19,8 +19,8 @@ from typing import (
     TypedDict,
     cast,
 )
-from urllib.request import Request, urlopen
 
+import httpx
 from packaging.utils import (
     parse_sdist_filename,
     parse_wheel_filename,
@@ -102,6 +102,7 @@ class DownloadedFile(TypedDict):
 
 def main() -> None:
     logging.basicConfig(format="%(message)s", level=logging.INFO)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -151,48 +152,49 @@ async def _update(
     tools_version: str,
     old_manifest: Manifest | None,
 ) -> Manifest:
-    (frida, frida_tools) = await gather(
-        pypi_get_project("frida"),
-        pypi_get_project("frida-tools"),
-    )
+    async with httpx.AsyncClient() as client:
+        (frida, frida_tools) = await gather(
+            pypi_get_project(client, "frida"),
+            pypi_get_project(client, "frida-tools"),
+        )
 
-    version = _select_version(frida, version)
-    tools_version = _select_version(frida_tools, tools_version)
+        version = _select_version(frida, version)
+        tools_version = _select_version(frida_tools, tools_version)
 
-    tools_sdist_file = None
-    wheels = None
-    artifacts = None
+        tools_sdist_file = None
+        wheels = None
+        artifacts = None
 
-    with suppress(Exception):
-        if old_manifest is not None:
-            if old_manifest["_version"] == version:
-                wheels = _ready(old_manifest["wheels"])
-                artifacts = _ready(old_manifest["artifacts"])
-            if old_manifest["_tools"]["_version"] == tools_version:
-                tools_sdist_file = _ready(
-                    (
-                        old_manifest["_tools"]["url"],
-                        old_manifest["_tools"]["hash"],
+        with suppress(Exception):
+            if old_manifest is not None:
+                if old_manifest["_version"] == version:
+                    wheels = _ready(old_manifest["wheels"])
+                    artifacts = _ready(old_manifest["artifacts"])
+                if old_manifest["_tools"]["_version"] == tools_version:
+                    tools_sdist_file = _ready(
+                        (
+                            old_manifest["_tools"]["url"],
+                            old_manifest["_tools"]["hash"],
+                        )
                     )
+                if (
+                    artifacts is not None
+                    and wheels is not None
+                    and tools_sdist_file is not None
+                ):
+                    return old_manifest
+
+        async with TaskGroup() as tg:
+            if tools_sdist_file is None:
+                tools_sdist_file = tg.create_task(
+                    download_sdist_file_for(client, frida_tools, tools_version)
                 )
-            if (
-                artifacts is not None
-                and wheels is not None
-                and tools_sdist_file is not None
-            ):
-                return old_manifest
+            if wheels is None:
+                wheels = tg.create_task(_download_frida_wheels(client, frida, version))
+            if artifacts is None:
+                artifacts = tg.create_task(_download_artifacts(client, version))
 
-    async with TaskGroup() as tg:
-        if tools_sdist_file is None:
-            tools_sdist_file = tg.create_task(
-                download_sdist_file_for(frida_tools, tools_version)
-            )
-        if wheels is None:
-            wheels = tg.create_task(_download_frida_wheels(frida, version))
-        if artifacts is None:
-            artifacts = tg.create_task(_download_artifacts(version))
-
-    (tools_sdist_url, tools_sdist_hash) = tools_sdist_file.result()
+        (tools_sdist_url, tools_sdist_hash) = tools_sdist_file.result()
 
     return Manifest(
         _version=version,
@@ -213,11 +215,12 @@ def _ready[T](value: T) -> Future[T]:
 
 
 async def _download_frida_wheels(
+    client: httpx.AsyncClient,
     project: "PyPIProject",
     version: str,
 ) -> dict[str, dict[str, DownloadedFile]]:
     return {
-        "frida": await _download_wheel_files_for(project, version),
+        "frida": await _download_wheel_files_for(client, project, version),
     }
 
 
@@ -230,27 +233,20 @@ def _select_version(
         # Note that we cannot use versions[-1] because PEP 700 states that
         # the order of the versions field is not significant.
         # See https://peps.python.org/pep-0700/#versions.
-        return max(versions, key=_parse_version)
+        return max(versions, key=Version)
     elif wanted_version not in versions:
-        raise ValueError(f"{project['name']}@{wanted_version} is not found")
+        raise ValueError(f"{project['name']}=={wanted_version} is not found")
     else:
         return wanted_version
 
 
-def _parse_version(version: str) -> tuple[int, int, int]:
-    tokens = version.split(".")
-    if len(tokens) != 3 or not all(map(str.isnumeric, tokens)):
-        raise ValueError(f"invalid version: {version}")
-    (major, minor, patch) = tuple(map(int, tokens))
-    return (major, minor, patch)
-
-
 async def _download_artifacts(
+    client: httpx.AsyncClient,
     version: str,
 ) -> dict[str, dict[str, DownloadedFile]]:
     download_files = await gather(
         *(
-            _download_artifact_for(version, artifact, system)
+            _download_artifact_for(client, version, artifact, system)
             for artifact, system in product(
                 GitHubArtifact.__members__.values(),
                 NixSystem.__members__.values(),
@@ -268,15 +264,17 @@ async def _download_artifacts(
 
 
 async def _download_artifact_for(
+    client: httpx.AsyncClient,
     version: str,
     artifact: GitHubArtifact,
     system: NixSystem,
 ) -> DownloadedFile:
     url = artifact.download_url_for(version, system)
-    return DownloadedFile(url=url, hash=await download_file(url))
+    return DownloadedFile(url=url, hash=await download_file(client, url))
 
 
 async def _download_wheel_files_for(
+    client: httpx.AsyncClient,
     project: "PyPIProject",
     version: str,
 ) -> dict[str, DownloadedFile]:
@@ -292,12 +290,13 @@ async def _download_wheel_files_for(
     wheel_files.sort(key=itemgetter(0))
 
     downloaded_files = await gather(
-        *(_download_wheel_file_for(wheel_files, system) for system in NixSystem)
+        *(_download_wheel_file_for(client, wheel_files, system) for system in NixSystem)
     )
     return dict(zip(NixSystem, downloaded_files, strict=True))
 
 
 async def _download_wheel_file_for(
+    client: httpx.AsyncClient,
     files: Iterable[tuple["_ParsedWheelFilename", "PyPIFile"]],
     system: NixSystem,
 ) -> DownloadedFile:
@@ -306,7 +305,7 @@ async def _download_wheel_file_for(
             if system.is_wheel_platform_compatible(platform):
                 return DownloadedFile(
                     url=file["url"],
-                    hash=await download_pypi_file(file),
+                    hash=await download_pypi_file(client, file),
                 )
     raise ValueError(f"no wheel file found for {system}")
 
@@ -366,19 +365,13 @@ class _ParsedWheelFilename:
         return self._cmp_key < other._cmp_key
 
 
-def asyncify[**P, T](
-    func: Callable[P, T],
-) -> Callable[P, Coroutine[None, None, T]]:
-    return wraps(func)(partial(to_thread, func))
-
-
 """
 Utility functions for downloading files and returning their SRI hashes.
 """
 
 
 async def download_sdist_file_for(
-    project: "PyPIProject", version: str
+    client: httpx.AsyncClient, project: "PyPIProject", version: str
 ) -> tuple[str, str]:
     (sdist_file, *rest) = pypi_sdist_files_for(project, version)
     if len(rest) != 0:
@@ -387,22 +380,23 @@ async def download_sdist_file_for(
             project["name"],
             version,
         )
-    return sdist_file["url"], await download_pypi_file(sdist_file)
+    return sdist_file["url"], await download_pypi_file(client, sdist_file)
 
 
-async def download_pypi_file(file: "PyPIFile") -> str:
+async def download_pypi_file(client: httpx.AsyncClient, file: "PyPIFile") -> str:
     if (hexdigest := file["hashes"].get("sha256")) is not None:
         return _sha256_digest_to_sri(unhexlify(hexdigest))
     # This is unlikely to happen, but just in case.
-    return await download_file(file["url"])
+    return await download_file(client, file["url"])
 
 
-@asyncify
-def download_file(url: str) -> str:
+async def download_file(client: httpx.AsyncClient, url: str) -> str:
     logger.info("downloading %s", url)
-    with urlopen(url) as f:
-        digest = file_digest(f, "sha256").digest()
-        return _sha256_digest_to_sri(digest)
+    async with client.stream("GET", url, follow_redirects=True) as resp:
+        h = hashlib.sha256()
+        async for chunk in resp.aiter_bytes():
+            h.update(chunk)
+        return _sha256_digest_to_sri(h.digest())
 
 
 def _sha256_digest_to_sri(digest: bytes) -> str:
@@ -430,14 +424,15 @@ class PyPIFile(TypedDict):
     hashes: dict[str, str]
 
 
-@asyncify
-def pypi_get_project(name: str) -> PyPIProject:
-    req = Request(f"https://pypi.org/simple/{name}/")
-    req.add_header("Accept", "application/vnd.pypi.simple.v1+json")
-    with urlopen(req) as resp:
-        data = json.load(resp)
-        assert data["meta"]["api-version"] != "1.0", "API version 1.0 is not supported"
-        return cast("PyPIProject", data)
+async def pypi_get_project(client: httpx.AsyncClient, name: str) -> PyPIProject:
+    resp = await client.get(
+        f"https://pypi.org/simple/{name}/",
+        headers={"Accept": "application/vnd.pypi.simple.v1+json"},
+        follow_redirects=True,
+    )
+    data = resp.json()
+    assert data["meta"]["api-version"] != "1.0", "API version 1.0 is not supported"
+    return cast("PyPIProject", data)
 
 
 def pypi_files_for(
